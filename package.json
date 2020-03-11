@@ -11,7 +11,10 @@
     "firebase": "7.10.0",
     "next": "9.3.0",
     "react": "16.13.0",
-    "react-dom": "16.13.0"
+    "react-dom": "16.13.0",
+    "tslint": "6.0.0",
+    "tslint-config-prettier": "1.18.0",
+    "tslint-react": "4.2.0"
   },
   "devDependencies": {
     "@types/node": "13.9.0",
