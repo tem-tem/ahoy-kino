@@ -1,0 +1,15 @@
+{
+  "extends": ["tslint:latest", "tslint-react", "tslint-config-prettier"],
+  "linterOptions": {
+    "exclude": ["node_modules", ".next", ".idea", "./**/*.js", "wiki"]
+  },
+  "rules": {
+    "interface-name": false,
+    "jsx-boolean-value": false,
+    "member-access": false,
+    "no-implicit-dependencies": [true, ["~", "@static", "@types"]],
+    "no-submodule-imports": false,
+    "object-literal-sort-keys": false,
+    "variable-name": [true, "allow-pascal-case", "allow-leading-underscore"]
+  }
+}
