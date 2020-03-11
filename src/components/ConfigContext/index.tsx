@@ -6,7 +6,6 @@ interface IConfig {
 }
 
 const firebase = loadFirebase()
-console.log('firebase:', firebase)
 
 export const ConfigContext = createContext<IConfig>({
   db: firebase.firestore(),

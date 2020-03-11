@@ -18,8 +18,7 @@ export default () => {
     messagingSenderId: '286129637538',
     appId: '1:286129637538:web:0ca508b13d1ab874ef2ffb',
   }
-  // firebase.initializeApp(firebaseConfig)
-  console.log(firebase.apps.length)
+
   return !firebase.apps.length
     ? firebase.initializeApp(firebaseConfig)
     : firebase
