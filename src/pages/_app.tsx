@@ -6,9 +6,10 @@ import loadFirebase from '~/lib/loadFirebase'
 function MyApp({ Component, pageProps }) {
   const firebase = loadFirebase()
   const db = firebase.firestore()
+  const storage = firebase.storage()
 
   return (
-    <ConfigProvider db={db}>
+    <ConfigProvider {...{ db, storage }}>
       <Component {...pageProps} />
     </ConfigProvider>
   )

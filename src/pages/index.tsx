@@ -2,46 +2,84 @@ import Head from 'next/head'
 import { ConfigContext } from '~/components/ConfigContext'
 import { useContext, useCallback, useState } from 'react'
 
-const Home = () => {
-  const { db } = useContext(ConfigContext)
-  const [names, setNames] = useState<string[]>([])
+interface Movie {
+  name: string
+  screens: Screen[]
+}
 
-  db.collection('users').onSnapshot(querySnapshot => {
-    const users = []
-    querySnapshot.forEach(doc => {
-      users.push(doc.data().first)
+interface Screen {
+  url: string
+  path: string
+}
+
+const Home = () => {
+  const { db, storage } = useContext(ConfigContext)
+  const storageRef = storage.ref()
+  const screensRef = storageRef.child('screens')
+  const [movies, setMovies] = useState<Movie[]>([])
+
+  db.collection('movies').onSnapshot(moviesSnapshot => {
+    const moviesData = []
+    moviesSnapshot.forEach(movieDoc => {
+      moviesData.push(movieDoc.data())
     })
-    setNames(old => {
-      if (old.length < users.length) {
-        return users
+
+    setMovies(old => {
+      if (old.length < moviesData.length) {
+        return moviesData
       }
       return old
     })
   })
 
-  const add = useCallback(
-    (data: { first: string }) =>
-      db
-        .collection('users')
-        .add({
-          first: data.first,
-          last: 'Lovelace',
-          born: 1815,
+  const uploadFile = (file: File) =>
+    screensRef
+      .child(file.name)
+      .put(file)
+      .then(snapshot => {
+        return snapshot.ref.getDownloadURL().then((url: string) => {
+          return { url, path: `screens/${file.name}` }
         })
-        .then(docRef => {
-          console.log('Document written with ID: ', docRef.id)
-        })
-        .catch(error => {
-          console.error('Error adding document: ', error)
-        }),
-    []
-  )
+      })
 
+  const add = useCallback(async (data: { name: string; files: File[] }) => {
+    const uploadedScreens = await Promise.all(
+      data.files.map(f => uploadFile(f))
+    )
+    db.collection('movies')
+      .add({
+        name: data.name,
+        screens: uploadedScreens,
+      })
+      .catch(error => {
+        console.error('Error adding document: ', error)
+      })
+  }, [])
+
+  // TODO: add tmdb requests
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     const data = new FormData(event.currentTarget)
-    const first = data.get('first').toString()
-    add({ first })
+    const files = data.getAll('screens') as File[]
+    const name = data.get('name').toString()
+    const fileInput = event.currentTarget.children.namedItem(
+      'file'
+    ) as HTMLInputElement
+    const nameInput = event.currentTarget.children.namedItem(
+      'name'
+    ) as HTMLInputElement
+
+    if (name.length < 1 || name.length > 324) {
+      console.error('Either name is too long, or you havent entered nothing')
+      nameInput.value = null
+      return
+    }
+    if (files.length > 9) {
+      console.error('9 screens is max')
+      fileInput.value = null
+      return
+    }
+    add({ name, files })
     event.currentTarget.reset()
   }
 
@@ -53,12 +91,22 @@ const Home = () => {
       </Head>
 
       <main>
-        <div>Next.js + Firebase</div>
+        <div>Add movie</div>
         <form action='submit' onSubmit={handleSubmit}>
-          <input type='text' name='first' id='first' />
+          <input type='text' name='name' id='name' />
+          <input type='file' multiple name='screens' id='file' />
           <button type='submit'>Add</button>
         </form>
-        <div>Names: {names.join(', ')}</div>
+        <div>
+          {movies.map(movie => (
+            <div key={movie.name}>
+              <div>{movie.name}</div>
+              {movie.screens.map(screen => (
+                <img src={screen.url} height={100} key={screen.url} />
+              ))}
+            </div>
+          ))}
+        </div>
       </main>
     </div>
   )
