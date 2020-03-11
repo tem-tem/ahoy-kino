@@ -6,7 +6,7 @@ import firebase from 'firebase/app'
 
 // // Add the Firebase products that you want to use
 // import "firebase/auth";
-// import "firebase/firestore";
+import 'firebase/firestore'
 
 export default () => {
   const firebaseConfig = {
@@ -18,8 +18,11 @@ export default () => {
     messagingSenderId: '286129637538',
     appId: '1:286129637538:web:0ca508b13d1ab874ef2ffb',
   }
-  firebase.initializeApp(firebaseConfig)
-  return firebase
+  // firebase.initializeApp(firebaseConfig)
+  console.log(firebase.apps.length)
+  return !firebase.apps.length
+    ? firebase.initializeApp(firebaseConfig)
+    : firebase
 }
 
 // Initialize Firebase

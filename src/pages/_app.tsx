@@ -1,0 +1,29 @@
+// import App from 'next/app'
+
+import { ConfigProvider } from '~/components/ConfigContext'
+import loadFirebase from '~/lib/loadFirebase'
+
+function MyApp({ Component, pageProps }) {
+  const firebase = loadFirebase()
+  const db = firebase.firestore()
+
+  return (
+    <ConfigProvider db={db}>
+      <Component {...pageProps} />
+    </ConfigProvider>
+  )
+}
+
+// Only uncomment this method if you have blocking data requirements for
+// every single page in your application. This disables the ability to
+// perform automatic static optimization, causing every page in your app to
+// be server-side rendered.
+//
+// MyApp.getInitialProps = async (appContext) => {
+//   // calls page's `getInitialProps` and fills `appProps.pageProps`
+//   const appProps = await App.getInitialProps(appContext);
+//
+//   return { ...appProps }
+// }
+
+export default MyApp
