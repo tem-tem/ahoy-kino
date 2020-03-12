@@ -7,9 +7,10 @@ function MyApp({ Component, pageProps }) {
   const firebase = loadFirebase()
   const db = firebase.firestore()
   const storage = firebase.storage()
+  const auth = firebase.auth()
 
   return (
-    <ConfigProvider {...{ db, storage }}>
+    <ConfigProvider {...{ db, storage, auth }}>
       <Component {...pageProps} />
     </ConfigProvider>
   )

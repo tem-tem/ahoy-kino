@@ -1,4 +1,5 @@
 import Head from 'next/head'
+import Link from 'next/link'
 import NewMovie from '~/components/NewMovie'
 import Feed from '~/components/Feed'
 
@@ -9,6 +10,7 @@ const Home = () => {
         <title>Ahoy Kino</title>
         <link rel='icon' href='/favicon.ico' />
       </Head>
+      <Link href='/login'>LOGIN</Link>
 
       <main>
         <NewMovie />

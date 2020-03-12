@@ -5,7 +5,7 @@ import firebase from 'firebase/app'
 // import "firebase/analytics";
 
 // // Add the Firebase products that you want to use
-// import "firebase/auth";
+import 'firebase/auth'
 import 'firebase/firestore'
 import 'firebase/storage'
 
@@ -22,7 +22,7 @@ export default () => {
 
   return !firebase.apps.length
     ? firebase.initializeApp(firebaseConfig)
-    : firebase
+    : firebase.app()
 }
 
 // Initialize Firebase
