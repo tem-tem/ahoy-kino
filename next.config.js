@@ -3,17 +3,17 @@ const { withPlugins } = require('next-compose-plugins')
 const { resolve } = require('path')
 const { mergeDeepRight } = require('ramda')
 // // const { PHASE_PRODUCTION_BUILD } = require('next/constants')
-// const dotenvLoad = require('dotenv-load')
-// const nextEnv = require('next-env')
+const dotenvLoad = require('dotenv-load')
+const nextEnv = require('next-env')
 
 // const { NODE_ENV } = process.env
-// const withNextEnv = nextEnv()
+const withNextEnv = nextEnv()
 
 // if (NODE_ENV === 'production') {
 //   dotenvLoad('production')
 // } else {
-//   dotenvLoad()
 // }
+dotenvLoad()
 
 // dotenvLoad('default')
 
@@ -44,5 +44,10 @@ module.exports = withPlugins([
   withCustomAliases({
     '~': resolve('src'),
     '@types': resolve('types'),
+  }),
+  withNextEnv({
+    env: {
+      TMDB_KEY: process.env.TMDB_KEY,
+    },
   }),
 ])

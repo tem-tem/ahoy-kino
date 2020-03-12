@@ -45,7 +45,6 @@ export default () => {
     }
   }
 
-  console.log(currentUser)
   return (
     <div>
       <Head>
