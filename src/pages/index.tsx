@@ -1,16 +1,8 @@
 import Head from 'next/head'
 import { ConfigContext } from '~/components/ConfigContext'
-import { useContext, useCallback, useState } from 'react'
-
-interface Movie {
-  name: string
-  screens: Screen[]
-}
-
-interface Screen {
-  url: string
-  path: string
-}
+import { useContext, useCallback, useState, useEffect } from 'react'
+import { Movie } from '~/types'
+import MovieComponent from '~/components/Movie'
 
 const Home = () => {
   const { db, storage } = useContext(ConfigContext)
@@ -18,20 +10,44 @@ const Home = () => {
   const screensRef = storageRef.child('screens')
   const [movies, setMovies] = useState<Movie[]>([])
 
-  db.collection('movies').onSnapshot(moviesSnapshot => {
-    const moviesData = []
-    moviesSnapshot.forEach(movieDoc => {
-      moviesData.push(movieDoc.data())
+  // Movies listener
+  //
+  useEffect(() => {
+    const unsubscribe = db.collection('movies').onSnapshot(moviesSnapshot => {
+      const moviesData = []
+      moviesSnapshot.forEach(movieDoc => {
+        moviesData.push({ id: movieDoc.id, ...movieDoc.data() })
+      })
+      setMovies(moviesData)
     })
+    return () => {
+      unsubscribe()
+    }
+  }, [db])
 
-    setMovies(old => {
-      if (old.length < moviesData.length) {
-        return moviesData
-      }
-      return old
-    })
-  })
-
+  // TODO: move form to a separate comp
+  //
+  // FORM START
+  //
+  // Add new movie, and upload screens
+  //
+  const add = useCallback(async (data: { name: string; files: File[] }) => {
+    let uploadedScreens = []
+    console.log(data.files)
+    if (data.files[0].size > 0) {
+      uploadedScreens = await Promise.all(data.files.map(f => uploadFile(f)))
+    }
+    db.collection('movies')
+      .add({
+        name: data.name,
+        screens: uploadedScreens,
+      })
+      .catch(error => {
+        console.error('Error adding document: ', error)
+      })
+  }, [])
+  // screen upload
+  //
   const uploadFile = (file: File) =>
     screensRef
       .child(file.name)
@@ -42,21 +58,6 @@ const Home = () => {
         })
       })
 
-  const add = useCallback(async (data: { name: string; files: File[] }) => {
-    const uploadedScreens = await Promise.all(
-      data.files.map(f => uploadFile(f))
-    )
-    db.collection('movies')
-      .add({
-        name: data.name,
-        screens: uploadedScreens,
-      })
-      .catch(error => {
-        console.error('Error adding document: ', error)
-      })
-  }, [])
-
-  // TODO: add tmdb requests
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     const data = new FormData(event.currentTarget)
@@ -69,8 +70,8 @@ const Home = () => {
       'name'
     ) as HTMLInputElement
 
-    if (name.length < 1 || name.length > 324) {
-      console.error('Either name is too long, or you havent entered nothing')
+    if (name.length < 1) {
+      console.error('Enter something')
       nameInput.value = null
       return
     }
@@ -82,6 +83,21 @@ const Home = () => {
     add({ name, files })
     event.currentTarget.reset()
   }
+  //
+  // FORM END
+  //
+
+  const deleteById = useCallback(id => {
+    db.collection('movies')
+      .doc(id)
+      .delete()
+      .then(() => {
+        console.log('Document successfully deleted!')
+      })
+      .catch(function(error) {
+        console.error('Error removing document: ', error)
+      })
+  }, [])
 
   return (
     <div className='container'>
@@ -99,12 +115,11 @@ const Home = () => {
         </form>
         <div>
           {movies.map(movie => (
-            <div key={movie.name}>
-              <div>{movie.name}</div>
-              {movie.screens.map(screen => (
-                <img src={screen.url} height={100} key={screen.url} />
-              ))}
-            </div>
+            <MovieComponent
+              key={movie.id}
+              movie={movie}
+              deleteById={deleteById}
+            />
           ))}
         </div>
       </main>
