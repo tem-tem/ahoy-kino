@@ -7,6 +7,7 @@ export default () => {
   const { db } = useContext(ConfigContext)
   const [movies, setMovies] = useState<Movie[]>([])
 
+  // TODO: add sorting
   // Movies listener
   //
   useEffect(() => {
@@ -36,6 +37,7 @@ export default () => {
 
   return (
     <div>
+      <div>FEED:</div>
       {movies.map(movie => (
         <MovieComponent key={movie.id} movie={movie} deleteById={deleteById} />
       ))}

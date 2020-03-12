@@ -4,6 +4,7 @@ import NewMovie from '~/components/NewMovie'
 import Feed from '~/components/Feed'
 import { useContext } from 'react'
 import { ConfigContext } from '~/components/ConfigContext'
+import Auth from '~/components/Auth'
 
 const Home = () => {
   const { currentUser } = useContext(ConfigContext)
@@ -14,9 +15,8 @@ const Home = () => {
         <link rel='icon' href='/favicon.ico' />
       </Head>
 
-      {!currentUser && <Link href='/login'>LOGIN</Link>}
-
       <main>
+        <Auth />
         {currentUser && <NewMovie />}
         <Feed />
       </main>
