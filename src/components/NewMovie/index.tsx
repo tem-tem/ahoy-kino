@@ -19,6 +19,7 @@ export default () => {
       db.collection('movies')
         .add({
           name,
+          createdAt: -new Date().getTime(),
           screens: uploadedScreens,
           userUid: currentUser.uid,
           ...selectedMovie,

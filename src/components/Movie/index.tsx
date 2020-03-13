@@ -16,9 +16,10 @@ export default (movieProps: IMovieProps) => {
       <div>{movie.id}</div>
       <div>{movie.name}</div>
       <div>
-        {movie.screens.map(screen => (
-          <img src={screen.url} height={100} key={screen.url} />
-        ))}
+        {movie.screens &&
+          movie.screens.map(screen => (
+            <img src={screen.url} height={100} key={screen.url} />
+          ))}
       </div>
       <button onClick={deleteMovie}>Delete</button>
       <br />
