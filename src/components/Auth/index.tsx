@@ -24,16 +24,28 @@ export default () => {
 
   return (
     <div>
+      <div>
+        <Link href='/'>
+          <a>Home</a>
+        </Link>
+      </div>
+      {currentUser && (
+        <div>
+          <div>
+            <Link href='/add'>
+              <a>Add</a>
+            </Link>
+          </div>
+          <div>
+            <div>{currentUser.email}</div>
+            <button onClick={logout}>Logout</button>
+          </div>
+        </div>
+      )}
       {!currentUser && (
         <Link href='/login'>
           <a>Entry for authors</a>
         </Link>
-      )}
-      {currentUser && (
-        <div>
-          <div>{currentUser.email}</div>
-          <button onClick={logout}>Logout</button>
-        </div>
       )}
     </div>
   )

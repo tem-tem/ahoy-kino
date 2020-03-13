@@ -2,6 +2,7 @@
 
 import { ConfigProvider } from '~/components/ConfigContext'
 import loadFirebase from '~/lib/loadFirebase'
+import Auth from '~/components/Auth'
 
 function MyApp({ Component, pageProps }) {
   const firebase = loadFirebase()
@@ -11,6 +12,7 @@ function MyApp({ Component, pageProps }) {
 
   return (
     <ConfigProvider {...{ db, storage, auth }}>
+      <Auth />
       <Component {...pageProps} />
     </ConfigProvider>
   )

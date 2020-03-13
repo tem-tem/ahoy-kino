@@ -8,10 +8,11 @@ export default () => {
   const storageRef = storage.ref()
   const screensRef = storageRef.child('screens')
   const [selectedMovie, setSelectedMovie] = useState<any>()
+  const [uploadPending, setPending] = useState(false)
 
   const add = useCallback(
     async (files: File[]) => {
-      files.map(f => console.log(f.name))
+      setPending(true)
       const uploadedScreens = await Promise.all(
         files.map((f, index) => uploadFile(f, index))
       )
@@ -25,6 +26,7 @@ export default () => {
           userUid: currentUser.uid,
           ...selectedMovie,
         })
+        .then(() => setPending(false))
         .catch(error => {
           console.error('Error adding document: ', error)
         })
@@ -62,7 +64,8 @@ export default () => {
   return (
     <div>
       <div>Add movie</div>
-      <SearchTMDB onMovieChange={setSelectedMovie} />
+      {uploadPending && <h1>Uploading...</h1>}
+      {!uploadPending && <SearchTMDB onMovieChange={setSelectedMovie} />}
       {selectedMovie && (
         <div>
           <img

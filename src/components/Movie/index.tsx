@@ -27,12 +27,6 @@ export default (movieProps: IMovieProps) => {
             <img src={screen.url} height={100} key={screen.url} />
           ))}
       </div>
-      <div>
-        {movie.screens &&
-          movie.screens.map(screen => (
-            <img src={screen.url} height={100} key={screen.url} />
-          ))}
-      </div>
       {currentUser && <button onClick={deleteMovie}>Delete</button>}
       <br />
     </div>

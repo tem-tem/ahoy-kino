@@ -50,7 +50,6 @@ export default () => {
       <Head>
         <title>Login</title>
       </Head>
-      <Link href='/'>HOME</Link>
 
       <div>
         <form action='login' onSubmit={handleSubmit}>
@@ -59,7 +58,6 @@ export default () => {
           <button type='submit'>Login</button>
         </form>
       </div>
-      {currentUser && <button onClick={logout}>Logout</button>}
     </div>
   )
 }
