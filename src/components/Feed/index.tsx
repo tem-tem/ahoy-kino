@@ -10,18 +10,6 @@ export default () => {
   const { db } = useContext(ConfigContext)
   const [movies, setMovies] = useState<Movie[]>([])
 
-  const deleteById = useCallback(id => {
-    db.collection('movies')
-      .doc(id)
-      .delete()
-      .then(() => {
-        console.log('Document successfully deleted!')
-      })
-      .catch(function(error) {
-        console.error('Error removing document: ', error)
-      })
-  }, [])
-
   const [nextPage, setNextPage] = useState(
     db
       .collection('movies')
@@ -90,11 +78,7 @@ export default () => {
         }
       >
         {movies.map(movie => (
-          <MovieComponent
-            key={movie.id}
-            movie={movie}
-            deleteById={deleteById}
-          />
+          <MovieComponent key={movie.id} movie={movie} />
         ))}
       </InfiniteScroll>
       {hasMore && <button onClick={loadPage}>Load more</button>}
