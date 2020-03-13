@@ -1,20 +1,21 @@
 import { ConfigContext } from '~/components/ConfigContext'
 import React, { useContext, useCallback, useState, useEffect } from 'react'
 import SearchTMDB from '../SearchTMDB'
+import ImageInput from './ImageInput'
 
 export default () => {
   const { db, storage, currentUser } = useContext(ConfigContext)
   const storageRef = storage.ref()
   const screensRef = storageRef.child('screens')
   const [selectedMovie, setSelectedMovie] = useState<any>()
-  const [selectedScreens, setSelectedScreens] = useState<any[]>([])
 
   const add = useCallback(
     async (files: File[]) => {
-      let uploadedScreens = []
-      if (files[0].size > 0) {
-        uploadedScreens = await Promise.all(files.map(f => uploadFile(f)))
-      }
+      files.map(f => console.log(f.name))
+      const uploadedScreens = await Promise.all(
+        files.map((f, index) => uploadFile(f, index))
+      )
+
       const name = selectedMovie.title || selectedMovie.name
       db.collection('movies')
         .add({
@@ -32,53 +33,29 @@ export default () => {
   )
   // screen upload
   const uploadFile = useCallback(
-    (file: File) => {
-      const fileName = `${selectedMovie.tmdb_id}-${new Date().getTime()}`
+    (file: File, order: number) => {
+      const fileName = `${selectedMovie.tmdb_id}-${getRandomInt(
+        new Date().getTime()
+      )}`
       return screensRef
         .child(fileName)
         .put(file)
         .then(snapshot => {
           return snapshot.ref.getDownloadURL().then((url: string) => {
-            return { url, path: `screens/${fileName}` }
+            return { url, path: `screens/${fileName}`, order }
           })
         })
     },
     [selectedMovie]
   )
+  function getRandomInt(max) {
+    return Math.floor(Math.random() * Math.floor(max))
+  }
 
-  const handleSubmit = useCallback(
-    (event: React.FormEvent<HTMLFormElement>) => {
-      event.preventDefault()
-      setSelectedMovie(null)
-      setSelectedScreens([])
-      const data = new FormData(event.currentTarget)
-      const files = data.getAll('screens') as File[]
-      const fileInput = event.currentTarget.children.namedItem(
-        'file'
-      ) as HTMLInputElement
-      if (files.length > 9) {
-        console.error('9 screens is max')
-        fileInput.value = null
-        return
-      }
-      add(files)
-      event.currentTarget.reset()
-    },
-    [add]
-  )
-
-  const handleFileChange = useCallback(e => {
-    setSelectedScreens([])
-    const { files } = e.currentTarget
-    for (let i = 0; i < files.length; i++) {
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        setSelectedScreens(olds => [...olds, reader.result])
-      }
-      const file = files.item(i)
-      reader.readAsDataURL(file)
-    }
-  }, [])
+  const handleImagesSubmit = (files: File[]) => {
+    add(files)
+    setSelectedMovie(null)
+  }
 
   const getPosterPath = path => `http://image.tmdb.org/t/p/w342${path}`
 
@@ -97,21 +74,7 @@ export default () => {
             {selectedMovie.first_air_date || selectedMovie.release_date}
           </div>
           <div>{selectedMovie.name || selectedMovie.title}</div>
-          <form action='submit' onSubmit={handleSubmit}>
-            <input
-              type='file'
-              multiple
-              name='screens'
-              id='file'
-              onChange={handleFileChange}
-            />
-            <div>
-              {selectedScreens.map((url, i) => (
-                <img src={url} key={i} height={100} />
-              ))}
-            </div>
-            <button type='submit'>Add</button>
-          </form>
+          <ImageInput onSubmit={handleImagesSubmit} />
         </div>
       )}
     </div>

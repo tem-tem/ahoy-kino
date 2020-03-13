@@ -14,7 +14,7 @@ export default () => {
         console.log('logout succ')
       })
       .catch(error => {
-        console.log(error)
+        console.error(error)
         // An error happened.
       })
     if (setCurrentUser) {

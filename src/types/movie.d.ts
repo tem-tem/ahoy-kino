@@ -7,4 +7,5 @@ export interface Movie {
 export interface Screen {
   url: string
   path: string
+  order: number
 }
