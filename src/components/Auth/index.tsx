@@ -23,30 +23,41 @@ export default () => {
   }
 
   return (
-    <div>
-      <div>
-        <Link href='/'>
-          <a>Home</a>
-        </Link>
-      </div>
-      {currentUser && (
+    <>
+      <style jsx>{`
+        .flex-between {
+          display: flex;
+          justify-content: space-between;
+        }
+        .headerContainer {
+          padding: 20px 50px;
+        }
+      `}</style>
+      <div className='flex-between headerContainer'>
         <div>
-          <div>
-            <Link href='/add'>
-              <a>Add</a>
-            </Link>
-          </div>
-          <div>
-            <div>{currentUser.email}</div>
-            <button onClick={logout}>Logout</button>
-          </div>
+          <Link href='/'>
+            <a>Home</a>
+          </Link>
         </div>
-      )}
-      {!currentUser && (
-        <Link href='/login'>
-          <a>Entry for authors</a>
-        </Link>
-      )}
-    </div>
+        {currentUser && (
+          <>
+            <div>
+              <Link href='/add'>
+                <a>Add</a>
+              </Link>
+            </div>
+            <div className='flex-between'>
+              <div style={{ marginRight: 10 }}>You: {currentUser.email}</div>
+              <button onClick={logout}>Logout</button>
+            </div>
+          </>
+        )}
+        {/* {!currentUser && (
+          <Link href='/login'>
+            <a>Entry for authors</a>
+          </Link>
+        )} */}
+      </div>
+    </>
   )
 }
