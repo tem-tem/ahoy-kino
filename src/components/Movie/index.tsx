@@ -1,6 +1,7 @@
 import React, { useContext, useCallback, useState } from 'react'
 import { Movie } from '~/types'
 import { ConfigContext } from '../ConfigContext'
+import Router from 'next/router'
 import Link from 'next/link'
 
 interface IMovieProps {
@@ -17,17 +18,24 @@ export default (movieProps: IMovieProps) => {
     screenshots.push(movie.screens.find(s => s.order === i))
   }
 
-  const deleteMovie = useCallback(() => {
+  const deleteFromDB = useCallback(id => {
     db.collection('movies')
-      .doc(movie.id)
+      .doc(id)
       .delete()
       .then(() => {
         setDeleted(true)
+        Router.push('/')
       })
-      .catch(function(error) {
+      .catch(error => {
         console.error('Error removing document: ', error)
       })
   }, [])
+
+  const deleteMovie = useCallback(() => {
+    if (confirm(`Delete ${movie.name}?`)) {
+      deleteFromDB(movie.id)
+    }
+  }, [movie])
 
   return (
     <div

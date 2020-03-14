@@ -7,6 +7,7 @@ import Movie from '~/components/Movie'
 const MoviePage = () => {
   const { db } = useContext(ConfigContext)
   const [movie, setMovie] = useState(null)
+  const [pending, setPending] = useState(true)
   const router = useRouter()
   const { movieId } = router.query
 
@@ -17,12 +18,13 @@ const MoviePage = () => {
         .get()
         .then(querySnapshot => {
           querySnapshot.forEach(doc => {
-            setMovie(doc.data())
+            setMovie({ id: doc.id, ...doc.data() })
           })
         })
         .catch(error => {
           console.error('Error getting document:', error)
         })
+        .finally(() => setPending(false))
     }
   }, [movieId])
 
@@ -34,8 +36,9 @@ const MoviePage = () => {
       </Head>
 
       <main>
-        {movie && <Movie movie={movie} />}
-        {!movie && 'Not Found'}
+        {pending && <div>Loading...</div>}
+        {movie && !pending && <Movie movie={movie} />}
+        {!movie && !pending && 'Movie Not Found'}
       </main>
     </div>
   )
