@@ -16,7 +16,7 @@ function MyApp({ Component, pageProps }) {
       <style jsx global>{`
         body {
           margin: 0;
-          background: #5d5d5d;
+          background: black;
           color: white;
         }
         .pageTitle {
