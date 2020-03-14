@@ -17,6 +17,7 @@
     "ramda": "0.27.0",
     "react": "16.13.0",
     "react-dom": "16.13.0",
+    "react-dropzone": "10.2.1",
     "react-infinite-scroller": "1.2.4",
     "react-select": "3.0.8",
     "tslint": "6.0.0",

@@ -1,4 +1,5 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react'
+import { useDropzone } from 'react-dropzone'
 
 interface Props {
   onSubmit: (blobs: File[]) => void
@@ -6,76 +7,57 @@ interface Props {
 
 export default ({ onSubmit }: Props) => {
   const activeImageRef = useRef<HTMLImageElement>(null)
-  const [activeImageNumber, setActiveImageNumber] = useState(0)
+  const [activeImageNumber, setActiveImageNumber] = useState(null)
   const [selectedScreens, setSelectedScreens] = useState<any[]>([])
   const [orderedFiles, setOrderedFiles] = useState<File[]>([])
 
-  useEffect(() => {
-    window.addEventListener('keydown', handleArrowKeyPress)
+  const onDrop = useCallback(files => {
+    // Do something with the files
+    setSelectedScreens([])
 
-    return () => {
-      window.removeEventListener('keydown', handleArrowKeyPress)
+    if (files.length > 9) {
+      console.error('9 screens is max')
+      return
     }
+
+    files.map(f => {
+      const reader = new FileReader()
+      reader.onloadend = () => addBlobToSelectedScreens(reader, f)
+      reader.readAsDataURL(f)
+    })
+  }, [])
+
+  const addBlobToSelectedScreens = useCallback((r, file) => {
+    setOrderedFiles(files => [...files, file])
+    setSelectedScreens(olds => [...olds, r.result])
+  }, [])
+
+  const { getRootProps, getInputProps } = useDropzone({
+    accept: 'image/jpeg, image/png',
+    multiple: true,
+    onDrop,
   })
 
-  const handleArrowKeyPress = useCallback(
-    (event: KeyboardEvent) => {
-      const { keyCode } = event
-      let newActiveNumber = activeImageNumber
-      if (orderedFiles.length === 0) {
-        return
-      }
-
-      // left arrow
-      if (keyCode === 37) {
-        newActiveNumber =
-          activeImageNumber === 0
-            ? selectedScreens.length - 1
-            : activeImageNumber - 1
-      }
-
-      // right arrow
-      if (keyCode === 39) {
-        newActiveNumber =
-          activeImageNumber === selectedScreens.length - 1
-            ? 0
-            : activeImageNumber + 1
-      }
-
-      setSelectedScreens(oldScreensOrder => {
-        const newScreensOrder = swapInArray(
-          activeImageNumber,
-          newActiveNumber,
-          oldScreensOrder
-        )
-        return newScreensOrder
-      })
-      setOrderedFiles(filesOldOrder => {
-        const newOrder = swapInArray(
-          activeImageNumber,
-          newActiveNumber,
-          filesOldOrder
-        )
-        return newOrder
-      })
-      setActiveImageNumber(newActiveNumber)
-      // console.log(newActiveNumber)
-    },
-    [activeImageNumber]
-  )
-
-  const swapInArray = (oldPos, newPos, array) => {
-    const tempArr = [...array]
-    const temp = tempArr[oldPos]
-    tempArr[oldPos] = tempArr[newPos]
-    tempArr[newPos] = temp
-    return tempArr
+  const swapInArray = (oldPos, newPos, setter) => {
+    setter(oldArr => {
+      const tempArr = [...oldArr]
+      const temp = tempArr[oldPos]
+      tempArr[oldPos] = tempArr[newPos]
+      tempArr[newPos] = temp
+      return tempArr
+    })
   }
 
   const handleClick = (e: React.MouseEvent<HTMLImageElement>) => {
     const target = e.currentTarget
-    const number = parseInt(target.getAttribute('data-order-number'), 0)
-    setActiveImageNumber(number)
+    const clickedPosNum = parseInt(target.getAttribute('data-order-number'), 0)
+    if (activeImageNumber !== null) {
+      swapInArray(activeImageNumber, clickedPosNum, setSelectedScreens)
+      swapInArray(activeImageNumber, clickedPosNum, setOrderedFiles)
+      setActiveImageNumber(null)
+    } else {
+      setActiveImageNumber(clickedPosNum)
+    }
   }
 
   const handleSubmit = useCallback(
@@ -84,35 +66,12 @@ export default ({ onSubmit }: Props) => {
       // const orderedFiles = order.map(i => {
       //   files
       // })
-
       onSubmit(orderedFiles)
       setSelectedScreens([])
       event.currentTarget.reset()
     },
     [onSubmit, orderedFiles]
   )
-
-  const addBlobToSelectedScreens = useCallback((r, file) => {
-    setOrderedFiles(files => [...files, file])
-    setSelectedScreens(olds => [...olds, r.result])
-  }, [])
-
-  const handleFileChange = useCallback(e => {
-    setSelectedScreens([])
-    const { files } = e.currentTarget
-    console.log(files)
-    if (files.length > 9) {
-      console.error('9 screens is max')
-      e.currentTarget.value = null
-      return
-    }
-
-    for (let i = 0; i < files.length; i++) {
-      const reader = new FileReader()
-      reader.onloadend = () => addBlobToSelectedScreens(reader, files.item(i))
-      reader.readAsDataURL(files.item(i))
-    }
-  }, [])
 
   return (
     <div>
@@ -121,16 +80,27 @@ export default ({ onSubmit }: Props) => {
           box-sizing: border-box;
           border: 5px solid red;
         }
+        .dropzone {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          padding: 20px;
+          border-width: 2px;
+          border-radius: 2px;
+          border-style: dashed;
+          background-color: #fafafa;
+          color: #bdbdbd;
+          outline: none;
+          transition: border 0.24s ease-in-out;
+        }
       `}</style>
 
       <form action='submit' onSubmit={handleSubmit}>
-        <input
-          type='file'
-          multiple
-          name='screens'
-          id='file'
-          onChange={handleFileChange}
-        />
+        <div {...getRootProps()} className='dropzone'>
+          Drop Files Here
+          <input {...getInputProps()} />
+        </div>
         {selectedScreens.map((url, i) => (
           <img
             src={url}
