@@ -1,11 +1,11 @@
 import Head from 'next/head'
-import Link from 'next/link'
 import { useContext } from 'react'
 import { ConfigContext } from '~/components/ConfigContext'
+import Router from 'next/router'
 
 export default () => {
   // const firebase = loadFirebase()
-  const { auth, currentUser, setCurrentUser } = useContext(ConfigContext)
+  const { auth, setCurrentUser } = useContext(ConfigContext)
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -18,6 +18,7 @@ export default () => {
       .then(userCreds => {
         if (setCurrentUser) {
           setCurrentUser(userCreds.user)
+          Router.push('/')
         }
       })
       .catch(error => {

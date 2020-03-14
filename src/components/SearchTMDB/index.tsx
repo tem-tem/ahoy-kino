@@ -19,8 +19,8 @@ const SearchTMDB = ({ onMovieChange, existingIds }: Props) => {
   const [selectedMovieLink, setSelectedMovieLink] = useState<SelectedMovie>()
   const promiseOptions = useCallback(
     (queryRaw: string) => {
-      const query = makeLink(queryRaw)
-      if (query.length < 1) {
+      const query = encodeURI(queryRaw)
+      if (query.length < 2) {
         return
       }
       return new Promise(resolve =>
@@ -41,7 +41,9 @@ const SearchTMDB = ({ onMovieChange, existingIds }: Props) => {
               res = filtered.map(f => {
                 return {
                   value: f.id,
-                  label: f.name || f.title,
+                  label: `${f.name || f.title} [${
+                    f.media_type
+                  }] [${f.first_air_date || f.release_date}]`,
                   media_type: f.media_type,
                 }
               })
