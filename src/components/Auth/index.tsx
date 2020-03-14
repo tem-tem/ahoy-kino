@@ -47,7 +47,7 @@ export default () => {
               </Link>
             </div>
             <div className='flex-between'>
-              <div style={{ marginRight: 10 }}>You: {currentUser.email}</div>
+              <div style={{ marginRight: 10 }}>You → {currentUser.email}</div>
               <button onClick={logout}>Logout</button>
             </div>
           </>
