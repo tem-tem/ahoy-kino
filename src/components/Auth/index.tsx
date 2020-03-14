@@ -21,14 +21,13 @@ export default () => {
       setCurrentUser(null)
     }
   }
+  if (!currentUser) {
+    return <div />
+  }
 
   return (
     <>
       <style jsx>{`
-        .flex-between {
-          display: flex;
-          justify-content: space-between;
-        }
         .headerContainer {
           padding: 20px 50px;
         }

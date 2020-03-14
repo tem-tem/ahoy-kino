@@ -39,28 +39,88 @@ export default (movieProps: IMovieProps) => {
   }, [movie])
 
   return (
-    <div
-      style={{
-        borderBottom: '1px solid',
-        paddingBottom: 10,
-        display: `${deleted ? 'none' : 'block'}`,
-      }}
-    >
-      <br />
-      {moviePage && <div>{movie.name}</div>}
-      {!moviePage && (
-        <Link href='/[movieId]' as={movie.directLink}>
-          <a>{movie.name}</a>
-        </Link>
-      )}
-      <div>
-        {screenshots &&
-          screenshots.map(screen => (
-            <img src={screen.url} height={100} key={screen.url} />
-          ))}
+    <>
+      <style jsx>{`
+        .imagesContainer {
+          display: grid;
+          grid-template-columns: ${moviePage ? 'auto' : 'auto auto auto'};
+          margin-bottom: 40px;
+        }
+        .imageContainer {
+          display: inline-grid;
+          position: relative;
+        }
+        .imageContainer img {
+          width: 100%;
+          box-sizing: border-box;
+        }
+
+        .movieTitleContainer {
+          margin: 50px 0 50px 20px;
+        }
+        .movieTitle {
+          font-weight: 100;
+          font-size: 2rem;
+        }
+        .movieTitle + a {
+          cursor: pointer;
+        }
+        .movieTitle a {
+          text-decoration: none;
+          border-bottom: 2px transparent;
+          color: inherit;
+        }
+        .movieTitle a:hover {
+          cursor: pointer;
+          border-bottom: 2px solid;
+          text-decoration: none;
+          color: inherit;
+        }
+        .deleteButton {
+          margin-right: 50px;
+          font-size: 1rem;
+        }
+        .movieDetails {
+          margin-top: 20px;
+        }
+      `}</style>
+      <div
+        style={{
+          display: `${deleted ? 'none' : 'block'}`,
+        }}
+      >
+        <div className='movieTitleContainer flex-between'>
+          <div>
+            <div className='movieTitle'>
+              {moviePage && <div>{movie.name}</div>}
+              {!moviePage && (
+                <Link href='/[movieId]' as={movie.directLink}>
+                  <a>{movie.name}</a>
+                </Link>
+              )}
+            </div>
+            <div className='movieDetails'>
+              {(movie.first_air_date || movie.release_date).substring(0, 4)} /{' '}
+              {movie.genres.map(g => g.name).join(' / ')}
+            </div>
+          </div>
+          {currentUser && (
+            <button className='deleteButton' onClick={deleteMovie}>
+              Delete
+            </button>
+          )}
+        </div>
+
+        <div className='imagesContainer'>
+          {screenshots &&
+            screenshots.map(screen => (
+              <div key={screen.url} className='imageContainer'>
+                <img src={screen.url} />
+              </div>
+            ))}
+        </div>
+        <br />
       </div>
-      {currentUser && <button onClick={deleteMovie}>Delete</button>}
-      <br />
-    </div>
+    </>
   )
 }

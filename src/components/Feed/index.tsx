@@ -65,7 +65,6 @@ export default () => {
 
   return (
     <div>
-      <div>FEED:</div>
       <InfiniteScroll
         pageStart={0}
         initialLoad={false}

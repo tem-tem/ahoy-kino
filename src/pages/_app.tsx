@@ -3,6 +3,7 @@
 import { ConfigProvider } from '~/components/ConfigContext'
 import loadFirebase from '~/lib/loadFirebase'
 import Auth from '~/components/Auth'
+import Link from 'next/link'
 
 function MyApp({ Component, pageProps }) {
   const firebase = loadFirebase()
@@ -15,12 +16,34 @@ function MyApp({ Component, pageProps }) {
       <style jsx global>{`
         body {
           margin: 0;
+          background: #5d5d5d;
+          color: white;
         }
         .pageTitle {
           text-align: center;
           padding: 50px 0;
+          font-weight: 100;
+        }
+        .flex-between {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+        .flex-left {
+          display: flex;
+          align-items: center;
+        }
+        .main-logo {
+          text-align: center;
+          font-weight: 100;
+          font-size: 1.3rem;
+          margin: 100px;
+          cursor: pointer;
         }
       `}</style>
+      <Link href='/'>
+        <h1 className='main-logo'>Ahoy-Kino</h1>
+      </Link>
       <Auth />
       <Component {...pageProps} />
     </ConfigProvider>
