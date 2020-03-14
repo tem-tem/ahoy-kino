@@ -38,7 +38,7 @@ const MoviePage = () => {
 
       <main>
         {pending && <div>Loading...</div>}
-        {movie && !pending && <Movie movie={movie} />}
+        {movie && !pending && <Movie movie={movie} moviePage={true} />}
         {!movie && !pending && 'Movie Not Found'}
       </main>
     </div>

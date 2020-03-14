@@ -92,27 +92,52 @@ export default () => {
 
   return (
     <div>
-      <div>Add movie</div>
-      {uploadPending && <h1>Uploading...</h1>}
-      {!uploadPending && (
-        <SearchTMDB onMovieChange={setSelectedMovie} existingIds={tmdbIds} />
-      )}
-      {selectedMovie && (
-        <div>
-          <img
-            src={getPosterPath(selectedMovie.poster_path)}
-            alt='poster'
-            height={180}
-          />
+      <style jsx>{`
+        .uploadInterfaceContainer {
+          min-height: 50vh;
+          margin: 0 50px;
+        }
+        .history {
+          margin-top: 100px;
+          padding: 0 20px 20px 20px;
+          width: 100vw;
+          border-top: 1px solid #e2e2e2;
+        }
+        .selectedMovie {
+          display: flex;
+          margin: 50px 0;
+        }
+        .selectedMovie img {
+          margin-right: 15px;
+        }
+      `}</style>
+      <h3 className='pageTitle'>Add movie</h3>
+      <div className='uploadInterfaceContainer'>
+        {uploadPending && <h1>Uploading...</h1>}
+        {!uploadPending && (
+          <SearchTMDB onMovieChange={setSelectedMovie} existingIds={tmdbIds} />
+        )}
+        {selectedMovie && (
           <div>
-            {selectedMovie.first_air_date || selectedMovie.release_date}
+            <div className='selectedMovie'>
+              <img
+                src={getPosterPath(selectedMovie.poster_path)}
+                alt='poster'
+                height={180}
+              />
+              <div>
+                <h1>{selectedMovie.name || selectedMovie.title}</h1>
+                <div>
+                  {selectedMovie.first_air_date || selectedMovie.release_date}
+                </div>
+              </div>
+            </div>
+            <ImageInput onSubmit={handleImagesSubmit} />
           </div>
-          <div>{selectedMovie.name || selectedMovie.title}</div>
-          <ImageInput onSubmit={handleImagesSubmit} />
-        </div>
-      )}
-      {movieList && (
-        <div>
+        )}
+      </div>
+      {movieList.length > 0 && (
+        <div className='history'>
           <h3>History of your uploads</h3>
           {movieList
             .filter(m => m.userUid === currentUser.uid)
@@ -120,7 +145,8 @@ export default () => {
               <div key={movie.id}>
                 <Link href={movie.directLink}>
                   <a>
-                    [{new Date(-movie.createdAt).toJSON()}]: {movie.name}
+                    [{new Date(-movie.createdAt).toLocaleString()}]:{' '}
+                    {movie.name}
                   </a>
                 </Link>
               </div>

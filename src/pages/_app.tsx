@@ -12,6 +12,15 @@ function MyApp({ Component, pageProps }) {
 
   return (
     <ConfigProvider {...{ db, storage, auth }}>
+      <style jsx global>{`
+        body {
+          margin: 0;
+        }
+        .pageTitle {
+          text-align: center;
+          padding: 50px 0;
+        }
+      `}</style>
       <Auth />
       <Component {...pageProps} />
     </ConfigProvider>

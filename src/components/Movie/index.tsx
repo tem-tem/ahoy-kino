@@ -6,10 +6,11 @@ import Link from 'next/link'
 
 interface IMovieProps {
   movie: Movie
+  moviePage?: boolean
 }
 
 export default (movieProps: IMovieProps) => {
-  const { movie } = movieProps
+  const { movie, moviePage } = movieProps
   const { currentUser, db } = useContext(ConfigContext)
   const [deleted, setDeleted] = useState(false)
   // const deleteMovie = () => deleteById(movie.id)
@@ -46,9 +47,12 @@ export default (movieProps: IMovieProps) => {
       }}
     >
       <br />
-      <Link href='/[movieId]' as={movie.directLink}>
-        <a>{movie.name}</a>
-      </Link>
+      {moviePage && <div>{movie.name}</div>}
+      {!moviePage && (
+        <Link href='/[movieId]' as={movie.directLink}>
+          <a>{movie.name}</a>
+        </Link>
+      )}
       <div>
         {screenshots &&
           screenshots.map(screen => (
