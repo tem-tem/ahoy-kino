@@ -3,6 +3,7 @@ import React, { useContext, useCallback, useState, useEffect } from 'react'
 import SearchTMDB from '../SearchTMDB'
 import ImageInput from './ImageInput'
 import Link from 'next/link'
+import makeLink from '~/helpers/makeLink'
 
 export default () => {
   const { db, storage, currentUser } = useContext(ConfigContext)
@@ -46,7 +47,7 @@ export default () => {
       db.collection('movies')
         .add({
           name,
-          directLink: encodeURI(name),
+          directLink: makeLink(name),
           createdAt: -new Date().getTime(),
           screens: uploadedScreens,
           userUid: currentUser.uid,
@@ -54,7 +55,6 @@ export default () => {
         })
         .then(() => {
           setPending(false)
-          // setUploadedMovies(um => [...um, encodeURI(name)])
         })
         .catch(error => {
           console.error('Error adding document: ', error)

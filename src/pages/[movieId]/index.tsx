@@ -3,6 +3,7 @@ import { useRouter } from 'next/router'
 import { useContext, useState, useEffect } from 'react'
 import { ConfigContext } from '~/components/ConfigContext'
 import Movie from '~/components/Movie'
+import makeLink from '~/helpers/makeLink'
 
 const MoviePage = () => {
   const { db } = useContext(ConfigContext)
@@ -14,7 +15,7 @@ const MoviePage = () => {
   useEffect(() => {
     if (movieId) {
       db.collection('movies')
-        .where('directLink', '==', encodeURI(movieId.toString()))
+        .where('directLink', '==', makeLink(movieId.toString()))
         .get()
         .then(querySnapshot => {
           querySnapshot.forEach(doc => {

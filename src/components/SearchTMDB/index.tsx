@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react'
 import AsyncSelect from 'react-select/async'
+import makeLink from '~/helpers/makeLink'
 
 const apiKey = process.env.TMDB_KEY
 
@@ -17,7 +18,8 @@ interface Props {
 const SearchTMDB = ({ onMovieChange, existingIds }: Props) => {
   const [selectedMovieLink, setSelectedMovieLink] = useState<SelectedMovie>()
   const promiseOptions = useCallback(
-    (query: string) => {
+    (queryRaw: string) => {
+      const query = makeLink(queryRaw)
       if (query.length < 1) {
         return
       }
@@ -28,19 +30,22 @@ const SearchTMDB = ({ onMovieChange, existingIds }: Props) => {
             return response.json()
           })
           .then(data => {
-            const filtered = data.results.filter(
-              f =>
-                (f.media_type === 'movie' || f.media_type === 'tv') &&
-                !existingIds.includes(f.id)
-            )
+            let res = []
+            if (data.results) {
+              const filtered = data.results.filter(
+                f =>
+                  (f.media_type === 'movie' || f.media_type === 'tv') &&
+                  !existingIds.includes(f.id)
+              )
 
-            const res = filtered.map(f => {
-              return {
-                value: f.id,
-                label: f.name || f.title,
-                media_type: f.media_type,
-              }
-            })
+              res = filtered.map(f => {
+                return {
+                  value: f.id,
+                  label: f.name || f.title,
+                  media_type: f.media_type,
+                }
+              })
+            }
             resolve(res)
           })
       )
