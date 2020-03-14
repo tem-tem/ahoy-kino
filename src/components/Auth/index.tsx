@@ -33,11 +33,6 @@ export default () => {
         }
       `}</style>
       <div className='flex-between headerContainer'>
-        <div>
-          <Link href='/'>
-            <a>Home</a>
-          </Link>
-        </div>
         {currentUser && (
           <>
             <div>

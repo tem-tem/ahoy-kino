@@ -76,12 +76,14 @@ const SearchTMDB = ({ onMovieChange, existingIds }: Props) => {
   }, [selectedMovieLink])
 
   return (
-    <AsyncSelect
-      cacheOptions
-      defaultOptions
-      loadOptions={promiseOptions}
-      onChange={setSelectedMovieLink}
-    />
+    <div style={{ color: 'black' }}>
+      <AsyncSelect
+        cacheOptions
+        defaultOptions
+        loadOptions={promiseOptions}
+        onChange={setSelectedMovieLink}
+      />
+    </div>
   )
 }
 

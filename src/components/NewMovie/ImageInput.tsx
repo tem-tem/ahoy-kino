@@ -108,7 +108,7 @@ export default ({ onSubmit }: Props) => {
           border-width: 2px;
           border-radius: 2px;
           border-style: dashed;
-          background-color: #fafafa;
+          // background-color: #fafafa;
           color: #bdbdbd;
           outline: none;
           transition: border 0.24s ease-in-out;

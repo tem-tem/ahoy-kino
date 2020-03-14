@@ -38,6 +38,8 @@ export default (movieProps: IMovieProps) => {
     }
   }, [movie])
 
+  const getPosterPath = path => `http://image.tmdb.org/t/p/w780${path}`
+
   return (
     <>
       <style jsx>{`
@@ -83,6 +85,10 @@ export default (movieProps: IMovieProps) => {
         .movieDetails {
           margin-top: 20px;
         }
+        .poster {
+          height: 250px;
+          padding-bottom: 30px;
+        }
       `}</style>
       <div
         style={{
@@ -91,6 +97,13 @@ export default (movieProps: IMovieProps) => {
       >
         <div className='movieTitleContainer flex-between'>
           <div>
+            {moviePage && (
+              <img
+                src={getPosterPath(movie.poster_path)}
+                alt='poster'
+                className='poster'
+              />
+            )}
             <div className='movieTitle'>
               {moviePage && <div>{movie.name}</div>}
               {!moviePage && (

@@ -40,11 +40,14 @@ function MyApp({ Component, pageProps }) {
           margin: 100px;
           cursor: pointer;
         }
+        a {
+          color: white;
+        }
       `}</style>
+      <Auth />
       <Link href='/'>
         <h1 className='main-logo'>Ahoy-Kino</h1>
       </Link>
-      <Auth />
       <Component {...pageProps} />
     </ConfigProvider>
   )

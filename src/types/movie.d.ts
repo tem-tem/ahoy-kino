@@ -6,6 +6,7 @@ export interface Movie {
   first_air_date?: string
   release_date?: string
   genres: Genre[]
+  poster_path: string
 }
 
 export interface Genre {
