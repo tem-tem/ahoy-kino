@@ -11,36 +11,42 @@ interface SelectedMovie {
 
 interface Props {
   onMovieChange: (a: any) => void
+  existingIds: number[]
 }
 
-const SearchTMDB = ({ onMovieChange }: Props) => {
+const SearchTMDB = ({ onMovieChange, existingIds }: Props) => {
   const [selectedMovieLink, setSelectedMovieLink] = useState<SelectedMovie>()
-  const promiseOptions = useCallback((query: string) => {
-    if (query.length < 1) {
-      return
-    }
-    return new Promise(resolve =>
-      fetch(`https://api.themoviedb.org/3/search/multi?api_key=${apiKey}&language=en-US&query=${query}&page=1&include_adult=false
+  const promiseOptions = useCallback(
+    (query: string) => {
+      if (query.length < 1) {
+        return
+      }
+      return new Promise(resolve =>
+        fetch(`https://api.themoviedb.org/3/search/multi?api_key=${apiKey}&language=en-US&query=${query}&page=1&include_adult=false
     `)
-        .then(response => {
-          return response.json()
-        })
-        .then(data => {
-          const filtered = data.results.filter(
-            f => f.media_type === 'movie' || f.media_type === 'tv'
-          )
-
-          const res = filtered.map(f => {
-            return {
-              value: f.id,
-              label: f.name || f.title,
-              media_type: f.media_type,
-            }
+          .then(response => {
+            return response.json()
           })
-          resolve(res)
-        })
-    )
-  }, [])
+          .then(data => {
+            const filtered = data.results.filter(
+              f =>
+                (f.media_type === 'movie' || f.media_type === 'tv') &&
+                !existingIds.includes(f.id)
+            )
+
+            const res = filtered.map(f => {
+              return {
+                value: f.id,
+                label: f.name || f.title,
+                media_type: f.media_type,
+              }
+            })
+            resolve(res)
+          })
+      )
+    },
+    [existingIds]
+  )
 
   useEffect(() => {
     if (selectedMovieLink) {

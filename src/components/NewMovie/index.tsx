@@ -10,8 +10,8 @@ export default () => {
   const screensRef = storageRef.child('screens')
   const [selectedMovie, setSelectedMovie] = useState<any>()
   const [uploadPending, setPending] = useState(false)
-  // const [uploadedMovies, setUploadedMovies] = useState([])
   const [movieList, setMovieList] = useState([])
+  const [tmdbIds, setTmdbIds] = useState([])
 
   // Movies listener
   //
@@ -19,7 +19,6 @@ export default () => {
     const unsubscribe = db
       .collection('movies')
       .orderBy('createdAt')
-      .where('userUid', '==', currentUser.uid)
       .onSnapshot(moviesSnapshot => {
         const moviesData = []
         moviesSnapshot.forEach(movieDoc => {
@@ -31,6 +30,10 @@ export default () => {
       unsubscribe()
     }
   }, [db])
+
+  useEffect(() => {
+    setTmdbIds(movieList.map(m => m.tmdb_id))
+  }, [movieList])
 
   const add = useCallback(
     async (files: File[]) => {
@@ -91,7 +94,9 @@ export default () => {
     <div>
       <div>Add movie</div>
       {uploadPending && <h1>Uploading...</h1>}
-      {!uploadPending && <SearchTMDB onMovieChange={setSelectedMovie} />}
+      {!uploadPending && (
+        <SearchTMDB onMovieChange={setSelectedMovie} existingIds={tmdbIds} />
+      )}
       {selectedMovie && (
         <div>
           <img
@@ -109,15 +114,17 @@ export default () => {
       {movieList && (
         <div>
           <h3>History of your uploads</h3>
-          {movieList.map(movie => (
-            <div key={movie.id}>
-              <Link href={movie.directLink}>
-                <a>
-                  [{new Date(-movie.createdAt).toJSON()}]: {movie.name}
-                </a>
-              </Link>
-            </div>
-          ))}
+          {movieList
+            .filter(m => m.userUid === currentUser.uid)
+            .map(movie => (
+              <div key={movie.id}>
+                <Link href={movie.directLink}>
+                  <a>
+                    [{new Date(-movie.createdAt).toJSON()}]: {movie.name}
+                  </a>
+                </Link>
+              </div>
+            ))}
         </div>
       )}
     </div>
