@@ -2,6 +2,7 @@ import { ConfigContext } from '~/components/ConfigContext'
 import React, { useContext, useCallback, useState, useEffect } from 'react'
 import SearchTMDB from '../SearchTMDB'
 import ImageInput from './ImageInput'
+import Link from 'next/link'
 
 export default () => {
   const { db, storage, currentUser } = useContext(ConfigContext)
@@ -9,6 +10,27 @@ export default () => {
   const screensRef = storageRef.child('screens')
   const [selectedMovie, setSelectedMovie] = useState<any>()
   const [uploadPending, setPending] = useState(false)
+  // const [uploadedMovies, setUploadedMovies] = useState([])
+  const [movieList, setMovieList] = useState([])
+
+  // Movies listener
+  //
+  useEffect(() => {
+    const unsubscribe = db
+      .collection('movies')
+      .orderBy('createdAt')
+      .where('userUid', '==', currentUser.uid)
+      .onSnapshot(moviesSnapshot => {
+        const moviesData = []
+        moviesSnapshot.forEach(movieDoc => {
+          moviesData.push({ id: movieDoc.id, ...movieDoc.data() })
+        })
+        setMovieList(moviesData)
+      })
+    return () => {
+      unsubscribe()
+    }
+  }, [db])
 
   const add = useCallback(
     async (files: File[]) => {
@@ -21,12 +43,16 @@ export default () => {
       db.collection('movies')
         .add({
           name,
+          directLink: encodeURI(name),
           createdAt: -new Date().getTime(),
           screens: uploadedScreens,
           userUid: currentUser.uid,
           ...selectedMovie,
         })
-        .then(() => setPending(false))
+        .then(() => {
+          setPending(false)
+          // setUploadedMovies(um => [...um, encodeURI(name)])
+        })
         .catch(error => {
           console.error('Error adding document: ', error)
         })
@@ -78,6 +104,20 @@ export default () => {
           </div>
           <div>{selectedMovie.name || selectedMovie.title}</div>
           <ImageInput onSubmit={handleImagesSubmit} />
+        </div>
+      )}
+      {movieList && (
+        <div>
+          <h3>History of your uploads</h3>
+          {movieList.map(movie => (
+            <div key={movie.id}>
+              <Link href={movie.directLink}>
+                <a>
+                  [{new Date(-movie.createdAt).toJSON()}]: {movie.name}
+                </a>
+              </Link>
+            </div>
+          ))}
         </div>
       )}
     </div>

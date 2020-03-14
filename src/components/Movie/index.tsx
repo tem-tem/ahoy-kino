@@ -1,6 +1,7 @@
 import React, { useContext, useCallback, useState } from 'react'
 import { Movie } from '~/types'
 import { ConfigContext } from '../ConfigContext'
+import Link from 'next/link'
 
 interface IMovieProps {
   movie: Movie
@@ -37,8 +38,9 @@ export default (movieProps: IMovieProps) => {
       }}
     >
       <br />
-      <div>{movie.id}</div>
-      <div>{movie.name}</div>
+      <Link href='/[movieId]' as={movie.directLink}>
+        <a>{movie.name}</a>
+      </Link>
       <div>
         {screenshots &&
           screenshots.map(screen => (

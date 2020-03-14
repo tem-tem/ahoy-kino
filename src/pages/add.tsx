@@ -1,5 +1,4 @@
 import Head from 'next/head'
-import Link from 'next/link'
 import NewMovie from '~/components/NewMovie'
 import { useContext } from 'react'
 import { ConfigContext } from '~/components/ConfigContext'

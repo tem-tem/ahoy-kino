@@ -22,6 +22,9 @@ export default ({ onSubmit }: Props) => {
     (event: KeyboardEvent) => {
       const { keyCode } = event
       let newActiveNumber = activeImageNumber
+      if (orderedFiles.length === 0) {
+        return
+      }
 
       // left arrow
       if (keyCode === 37) {
@@ -97,6 +100,7 @@ export default ({ onSubmit }: Props) => {
   const handleFileChange = useCallback(e => {
     setSelectedScreens([])
     const { files } = e.currentTarget
+    console.log(files)
     if (files.length > 9) {
       console.error('9 screens is max')
       e.currentTarget.value = null
