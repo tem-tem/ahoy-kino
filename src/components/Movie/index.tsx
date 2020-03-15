@@ -37,7 +37,7 @@ export default (movieProps: IMovieProps) => {
     }
   }, [movie])
 
-  const getPosterPath = path => `http://image.tmdb.org/t/p/w780${path}`
+  const getPosterPath = path => `https://image.tmdb.org/t/p/w780${path}`
 
   return (
     <>
