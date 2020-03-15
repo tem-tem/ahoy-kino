@@ -15,6 +15,11 @@ export interface Genre {
 }
 
 export interface Screen {
+  name: string
+  publicUrls: {
+    thumb: string
+    full: string
+  }
   url: string
   path: string
   order: number

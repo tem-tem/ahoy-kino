@@ -18,7 +18,6 @@ export default (movieProps: IMovieProps) => {
   for (let i = 0; i < movie.screens.length; i++) {
     screenshots.push(movie.screens.find(s => s.order === i))
   }
-
   const deleteFromDB = useCallback(id => {
     db.collection('movies')
       .doc(id)
@@ -38,7 +37,7 @@ export default (movieProps: IMovieProps) => {
     }
   }, [movie])
 
-  const getPosterPath = path => `http://image.tmdb.org/t/p/w780${path}`
+  const getPosterPath = path => `https://image.tmdb.org/t/p/w780${path}`
 
   return (
     <>
@@ -107,7 +106,7 @@ export default (movieProps: IMovieProps) => {
             <div className='movieTitle'>
               {moviePage && <div>{movie.name}</div>}
               {!moviePage && (
-                <Link href='/[movieId]' as={movie.directLink}>
+                <Link href='/[directLink]' as={movie.directLink}>
                   <a>{movie.name}</a>
                 </Link>
               )}
@@ -126,12 +125,29 @@ export default (movieProps: IMovieProps) => {
 
         <div className='imagesContainer'>
           {screenshots &&
+            screenshots.map(screen => {
+              if (screen.publicUrls) {
+                let url = screen.publicUrls.thumb
+                if (moviePage) {
+                  url = screen.publicUrls.full
+                }
+                return (
+                  <div key={url} className='imageContainer'>
+                    <img src={url} />
+                  </div>
+                )
+              }
+            })}
+        </div>
+
+        {/* <div className='imagesContainer'>
+          {screenshots &&
             screenshots.map(screen => (
               <div key={screen.url} className='imageContainer'>
                 <img src={screen.url} />
               </div>
             ))}
-        </div>
+        </div> */}
         <br />
       </div>
     </>

@@ -47,7 +47,7 @@ export default () => {
       db.collection('movies')
         .add({
           name,
-          directLink: makeLink(name),
+          directLink: makeLink(`${name}-${selectedMovie.tmdb_id}`),
           createdAt: -new Date().getTime(),
           screens: uploadedScreens,
           userUid: currentUser.uid,
@@ -71,14 +71,20 @@ export default () => {
       return screensRef
         .child(fileName)
         .put(file)
-        .then(snapshot => {
-          return snapshot.ref.getDownloadURL().then((url: string) => {
-            return { url, path: `screens/${fileName}`, order }
-          })
+        .then(() => {
+          return {
+            name: fileName,
+            order,
+            publicUrls: {
+              thumb: `https://firebasestorage.googleapis.com/v0/b/ahoy-kino.appspot.com/o/screens%2Fthumbs%2F${fileName}_500x500?alt=media`,
+              full: `https://firebasestorage.googleapis.com/v0/b/ahoy-kino.appspot.com/o/screens%2F${fileName}?alt=media`,
+            },
+          }
         })
     },
     [selectedMovie]
   )
+
   function getRandomInt(max) {
     return Math.floor(Math.random() * Math.floor(max))
   }
@@ -100,7 +106,6 @@ export default () => {
         .history {
           margin-top: 100px;
           padding: 0 20px 20px 20px;
-          width: 100vw;
           border-top: 1px solid #e2e2e2;
         }
         .selectedMovie {
