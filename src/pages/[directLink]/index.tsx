@@ -38,6 +38,10 @@ const MoviePage: NextPage<Props> = props => {
           <meta property='og:image:height' content='800' />
 
           <meta name='twitter:card' content='summary_large_image' />
+          <meta
+            property='twitter:url'
+            content={`https://ahoy-kino.now.sh/${movie.directLink}`}
+          />
           <meta name='twitter:title' content={movie.name} />
           <meta name='twitter:description' content={description} />
           <meta

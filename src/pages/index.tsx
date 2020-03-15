@@ -28,17 +28,11 @@ const Home: NextPage<Props> = props => {
         <meta property='og:image:width' content='1280' />
         <meta property='og:image:height' content='800' />
 
-        {/* <meta property='twitter:card' content='summary_large_image' />
-        <meta property='twitter:url' content='https://metatags.io/' />
-        <meta property='twitter:title' content='придумайте название' />
-        <meta
-          property='twitter:description'
-          content='название придумайте умоляю'
-        />
-        <meta
-          property='twitter:image'
-          content='https://metatags.io/assets/meta-tags-16a33a6a8531e519cc0936fbba0ad904e52d35f34a46c97a2c9f6f7dd7d336f2.png'
-        /> */}
+        <meta name='twitter:card' content='summary_large_image' />
+        <meta property='twitter:url' content={`https://ahoy-kino.now.sh`} />
+        <meta name='twitter:title' content='придумайте название' />
+        <meta name='twitter:description' content='название придумайте умоляю' />
+        <meta name='twitter:image' content='/preview.jpg' />
       </Head>
 
       <main>
