@@ -36,6 +36,14 @@ const MoviePage: NextPage<Props> = props => {
           />
           <meta property='og:image:width' content='1280' />
           <meta property='og:image:height' content='800' />
+
+          <meta name='twitter:card' content='summary_large_image' />
+          <meta name='twitter:title' content={movie.name} />
+          <meta name='twitter:description' content={description} />
+          <meta
+            name='twitter:image'
+            content={movie.screens[4].publicUrls.thumb}
+          />
         </Head>
 
         <main>
