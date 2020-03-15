@@ -106,7 +106,6 @@ export default () => {
         .history {
           margin-top: 100px;
           padding: 0 20px 20px 20px;
-          width: 100vw;
           border-top: 1px solid #e2e2e2;
         }
         .selectedMovie {

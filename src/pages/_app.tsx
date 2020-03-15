@@ -46,7 +46,7 @@ function MyApp({ Component, pageProps }) {
       `}</style>
       <Auth />
       <Link href='/'>
-        <h1 className='main-logo'>Ahoy-Kino</h1>
+        <h1 className='main-logo'>ahoy-kino</h1>
       </Link>
       <Component {...pageProps} />
     </ConfigProvider>
