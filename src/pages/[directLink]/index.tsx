@@ -11,20 +11,40 @@ interface Props {
 
 const MoviePage: NextPage<Props> = props => {
   const { movieData: movie } = props
+  if (movie) {
+    const description = `${(
+      movie.first_air_date || movie.release_date
+    ).substring(0, 4)} / ${movie.genres.map(g => g.name).join(' / ')}`
+    return (
+      <div className='container'>
+        <Head>
+          <title>Ahoy Kino</title>
+          <link rel='icon' href='/favicon.ico' />
+          <meta name='title' content={movie.name} />
+          <meta name='description' content={description} />
 
-  return (
-    <div className='container'>
-      <Head>
-        <title>Ahoy Kino</title>
-        <link rel='icon' href='/favicon.ico' />
-      </Head>
+          <meta property='og:type' content='website' />
+          <meta
+            property='og:url'
+            content={`https://ahoy-kino.now.sh/${movie.directLink}`}
+          />
+          <meta property='og:title' content={movie.name} />
+          <meta property='og:description' content={description} />
+          <meta
+            property='og:image'
+            content={movie.screens[4].publicUrls.thumb}
+          />
+          <meta property='og:image:width' content='1280' />
+          <meta property='og:image:height' content='800' />
+        </Head>
 
-      <main>
-        {movie && <Movie movie={movie} moviePage={true} />}
-        {!movie && 'Movie Not Found'}
-      </main>
-    </div>
-  )
+        <main>
+          {movie && <Movie movie={movie} moviePage={true} />}
+          {!movie && 'Movie Not Found'}
+        </main>
+      </div>
+    )
+  }
 }
 
 const getProps = () => async (props: NextPageContext) => {
@@ -40,7 +60,6 @@ const getProps = () => async (props: NextPageContext) => {
           .where('directLink', '==', makeLink(directLink.toString()))
           .get()
           .then(querySnapshot => {
-            console.log(querySnapshot.size)
             if (res && querySnapshot.size === 0) {
               res.statusCode = 404
               res.end('Not found')

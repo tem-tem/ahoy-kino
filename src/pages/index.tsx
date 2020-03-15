@@ -25,6 +25,8 @@ const Home: NextPage<Props> = props => {
         <meta property='og:title' content='придумайте название' />
         <meta property='og:description' content='название придумайте умоляю' />
         <meta property='og:image' content='/preview.jpg' />
+        <meta property='og:image:width' content='1280' />
+        <meta property='og:image:height' content='800' />
 
         {/* <meta property='twitter:card' content='summary_large_image' />
         <meta property='twitter:url' content='https://metatags.io/' />
