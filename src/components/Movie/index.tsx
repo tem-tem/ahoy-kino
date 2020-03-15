@@ -106,7 +106,7 @@ export default (movieProps: IMovieProps) => {
             <div className='movieTitle'>
               {moviePage && <div>{movie.name}</div>}
               {!moviePage && (
-                <Link href='/[movieId]' as={movie.directLink}>
+                <Link href='/[directLink]' as={movie.directLink}>
                   <a>{movie.name}</a>
                 </Link>
               )}

@@ -47,7 +47,7 @@ export default () => {
       db.collection('movies')
         .add({
           name,
-          directLink: makeLink(name),
+          directLink: makeLink(`${name}-${selectedMovie.tmdb_id}`),
           createdAt: -new Date().getTime(),
           screens: uploadedScreens,
           userUid: currentUser.uid,

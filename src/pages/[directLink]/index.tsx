@@ -10,12 +10,12 @@ const MoviePage = () => {
   const [movie, setMovie] = useState(null)
   const [pending, setPending] = useState(true)
   const router = useRouter()
-  const { movieId } = router.query
+  const { directLink } = router.query
 
   useEffect(() => {
-    if (movieId) {
+    if (directLink) {
       db.collection('movies')
-        .where('directLink', '==', makeLink(movieId.toString()))
+        .where('directLink', '==', makeLink(directLink.toString()))
         .get()
         .then(querySnapshot => {
           querySnapshot.forEach(doc => {
@@ -27,7 +27,7 @@ const MoviePage = () => {
         })
         .finally(() => setPending(false))
     }
-  }, [movieId])
+  }, [directLink])
 
   return (
     <div className='container'>
