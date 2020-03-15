@@ -15,8 +15,28 @@ const Home: NextPage<Props> = props => {
   return (
     <div className='container'>
       <Head>
-        <title>Ahoy Kino</title>
+        <title>ahoy-kino</title>
         <link rel='icon' href='/favicon.ico' />
+        <meta name='title' content='придумайте название' />
+        <meta name='description' content='название придумайте умоляю' />
+
+        <meta property='og:type' content='website' />
+        <meta property='og:url' content='https://metatags.io/' />
+        <meta property='og:title' content='придумайте название' />
+        <meta property='og:description' content='название придумайте умоляю' />
+        <meta property='og:image' content='/preview.jpg' />
+
+        {/* <meta property='twitter:card' content='summary_large_image' />
+        <meta property='twitter:url' content='https://metatags.io/' />
+        <meta property='twitter:title' content='придумайте название' />
+        <meta
+          property='twitter:description'
+          content='название придумайте умоляю'
+        />
+        <meta
+          property='twitter:image'
+          content='https://metatags.io/assets/meta-tags-16a33a6a8531e519cc0936fbba0ad904e52d35f34a46c97a2c9f6f7dd7d336f2.png'
+        /> */}
       </Head>
 
       <main>
