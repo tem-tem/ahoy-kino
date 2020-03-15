@@ -9,8 +9,9 @@ interface Props {
   movieData?: MovieType
 }
 
-const MoviePage: NextPage<Props> = props => {
+const CollagePage: NextPage<Props> = props => {
   const { movieData: movie } = props
+  const screenshots = movie.screens
 
   return (
     <div className='container'>
@@ -20,8 +21,28 @@ const MoviePage: NextPage<Props> = props => {
       </Head>
 
       <main>
-        {movie && <Movie movie={movie} moviePage={true} />}
-        {!movie && 'Movie Not Found'}
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'auto auto auto',
+            marginBottom: 40,
+          }}
+        >
+          {screenshots &&
+            screenshots.map(screen => {
+              if (screen.publicUrls) {
+                const url = screen.publicUrls.full
+                return (
+                  <div
+                    key={url}
+                    style={{ display: 'inline-grid', position: 'relative' }}
+                  >
+                    <img src={url} style={{ width: '100%' }} />
+                  </div>
+                )
+              }
+            })}
+        </div>
       </main>
     </div>
   )
@@ -40,7 +61,6 @@ const getProps = () => async (props: NextPageContext) => {
           .where('directLink', '==', makeLink(directLink.toString()))
           .get()
           .then(querySnapshot => {
-            console.log(querySnapshot.size)
             if (res && querySnapshot.size === 0) {
               res.statusCode = 404
               res.end('Not found')
@@ -62,6 +82,6 @@ const getProps = () => async (props: NextPageContext) => {
   return { movieData: null }
 }
 
-MoviePage.getInitialProps = getProps()
+CollagePage.getInitialProps = getProps()
 
-export default MoviePage
+export default CollagePage
