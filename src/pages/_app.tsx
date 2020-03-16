@@ -4,6 +4,8 @@ import { ConfigProvider } from '~/components/ConfigContext'
 import loadFirebase from '~/lib/loadFirebase'
 import Auth from '~/components/Auth'
 import Link from 'next/link'
+import Head from 'next/head'
+import '~/styles/global.css'
 
 function MyApp({ Component, pageProps }) {
   const firebase = loadFirebase()
@@ -13,41 +15,30 @@ function MyApp({ Component, pageProps }) {
 
   return (
     <ConfigProvider {...{ db, storage, auth }}>
-      <style jsx global>{`
-        body {
-          margin: 0;
-          background: black;
-          color: white;
-        }
-        .pageTitle {
-          text-align: center;
-          padding: 50px 0;
-          font-weight: 100;
-        }
-        .flex-between {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-        }
-        .flex-left {
-          display: flex;
-          align-items: center;
-        }
-        .main-logo {
-          text-align: center;
-          font-weight: 100;
-          font-size: 1.3rem;
-          margin: 100px;
-          cursor: pointer;
-        }
-        a {
-          color: white;
-        }
-      `}</style>
+      <Head>
+        <link
+          rel='preload'
+          href='/fonts/Montserrat/Montserrat-Regular.ttf'
+          as='font'
+        />
+        <link
+          rel='preload'
+          href='/fonts/Playfair_Display/static/PlayfairDisplay-Regular.ttf'
+          as='font'
+        />
+        <link
+          rel='preload'
+          href='/fonts/Playfair_Display/static/PlayfairDisplay-Black.ttf'
+          as='font'
+        />
+      </Head>
       <Auth />
-      <Link href='/'>
-        <h1 className='main-logo'>ahoy-kino</h1>
-      </Link>
+      <div className='main-logo-container'>
+        <div />
+        <Link href='/'>
+          <h1 className='main-logo'>ahoy-kino</h1>
+        </Link>
+      </div>
       <Component {...pageProps} />
     </ConfigProvider>
   )

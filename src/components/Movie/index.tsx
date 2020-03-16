@@ -57,23 +57,30 @@ export default (movieProps: IMovieProps) => {
         }
 
         .movieTitleContainer {
-          margin: 50px 0 50px 20px;
+          margin: 0 0 50px 20px;
+          position: sticky;
+          top: 0;
+          z-index: 999;
+          max-width: calc(100vw - 200px);
+          display: inline-block;
+        }
+        .movieInfo {
+          padding-bottom: 10px;
         }
         .movieTitle {
-          font-weight: 100;
-          font-size: 2rem;
+          margin: 0;
         }
         .movieTitle + a {
           cursor: pointer;
         }
         .movieTitle a {
           text-decoration: none;
-          border-bottom: 2px transparent;
+          // border-bottom: 2px transparent;
           color: inherit;
         }
         .movieTitle a:hover {
           cursor: pointer;
-          border-bottom: 2px solid;
+          // border-bottom: 2px solid;
           text-decoration: none;
           color: inherit;
         }
@@ -94,23 +101,23 @@ export default (movieProps: IMovieProps) => {
           display: `${deleted ? 'none' : 'block'}`,
         }}
       >
+        {moviePage && (
+          <img
+            src={getPosterPath(movie.poster_path)}
+            alt='poster'
+            className='poster'
+          />
+        )}
         <div className='movieTitleContainer flex-between'>
-          <div>
-            {moviePage && (
-              <img
-                src={getPosterPath(movie.poster_path)}
-                alt='poster'
-                className='poster'
-              />
-            )}
-            <div className='movieTitle'>
+          <div className='movieInfo'>
+            <h2 className='movieTitle'>
               {moviePage && <div>{movie.name}</div>}
               {!moviePage && (
                 <Link href='/[directLink]' as={movie.directLink}>
                   <a>{movie.name}</a>
                 </Link>
               )}
-            </div>
+            </h2>
             <div className='movieDetails'>
               {(movie.first_air_date || movie.release_date).substring(0, 4)} /{' '}
               {movie.genres.map(g => g.name).join(' / ')}
