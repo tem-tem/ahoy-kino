@@ -61,6 +61,16 @@ export default ({ initMovies, ELEMENTS_ON_PAGE }: Props) => {
 
   return (
     <div>
+      <style jsx>{`
+        .loader {
+          text-align: center;
+        }
+        .endMessage {
+          text-align: center;
+          padding: 40px;
+          opacity: 0.7;
+        }
+      `}</style>
       <InfiniteScroll
         pageStart={0}
         initialLoad={false}
@@ -76,6 +86,7 @@ export default ({ initMovies, ELEMENTS_ON_PAGE }: Props) => {
           <MovieComponent key={movie.id} movie={movie} />
         ))}
       </InfiniteScroll>
+      {!lastMovie && <div className='endMessage'>This is it for now ♡</div>}
     </div>
   )
 }

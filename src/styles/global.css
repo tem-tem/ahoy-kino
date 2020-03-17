@@ -55,6 +55,13 @@ body {
   cursor: pointer;
   display: inline-block;
 }
+
+@media only screen and (max-width: 720px) {
+  .main-logo-container {
+    background-color: black;
+  }
+}
+
 a {
   color: white;
 }

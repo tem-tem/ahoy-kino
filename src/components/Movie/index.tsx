@@ -58,10 +58,7 @@ export default (movieProps: IMovieProps) => {
 
         .movieTitleContainer {
           margin: 0 0 50px 20px;
-          position: sticky;
-          top: 0;
           z-index: 999;
-          max-width: calc(100vw - 200px);
           display: inline-block;
         }
         .movieInfo {
@@ -75,7 +72,6 @@ export default (movieProps: IMovieProps) => {
         }
         .movieTitle a {
           text-decoration: none;
-          // border-bottom: 2px transparent;
           color: inherit;
         }
         .movieTitle a:hover {
@@ -91,9 +87,12 @@ export default (movieProps: IMovieProps) => {
         .movieDetails {
           margin-top: 20px;
         }
+        .posterContainer {
+          padding-left: 20px;
+          padding-bottom: 30px;
+        }
         .poster {
           height: 250px;
-          padding-bottom: 30px;
         }
       `}</style>
       <div
@@ -102,11 +101,13 @@ export default (movieProps: IMovieProps) => {
         }}
       >
         {moviePage && (
-          <img
-            src={getPosterPath(movie.poster_path)}
-            alt='poster'
-            className='poster'
-          />
+          <div className='posterContainer'>
+            <img
+              src={getPosterPath(movie.poster_path)}
+              alt='poster'
+              className='poster'
+            />
+          </div>
         )}
         <div className='movieTitleContainer flex-between'>
           <div className='movieInfo'>
@@ -146,15 +147,6 @@ export default (movieProps: IMovieProps) => {
               }
             })}
         </div>
-
-        {/* <div className='imagesContainer'>
-          {screenshots &&
-            screenshots.map(screen => (
-              <div key={screen.url} className='imageContainer'>
-                <img src={screen.url} />
-              </div>
-            ))}
-        </div> */}
         <br />
       </div>
     </>
