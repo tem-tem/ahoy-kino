@@ -58,7 +58,9 @@ body {
 
 @media only screen and (max-width: 720px) {
   .main-logo-container {
-    background-color: black;
+    background-color: #0003;
+    backdrop-filter: blur(20px) brightness(40%);
+    padding-bottom: 5px;
   }
 }
 

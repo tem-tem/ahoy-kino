@@ -122,7 +122,7 @@ export default (movieProps: IMovieProps) => {
 
       <style jsx>{`
         .screen {
-          min-height: calc(100vh / 3 / 2.5);
+          min-height: calc(100vw / 3 / 2.5);
         }
         .imagesContainer {
           display: grid;
