@@ -39,62 +39,30 @@ export default (movieProps: IMovieProps) => {
 
   const getPosterPath = path => `https://image.tmdb.org/t/p/w780${path}`
 
+  const details = [
+    (movie.first_air_date || movie.release_date).substring(0, 4),
+    `${movie.first_air_date ? 'Series' : 'Movie'}`,
+    movie.genres.map(g => g.name).join(' / '),
+  ]
+  const subDetails = []
+  if (movie.runtime) {
+    const hours = Math.floor(movie.runtime / 60)
+    const mins = movie.runtime % 60
+    subDetails.push(
+      `${hours} hour${hours > 1 ? 's' : ''} ${mins} min${mins > 1 ? 's' : ''}`
+    )
+  }
+  if (movie.number_of_seasons) {
+    subDetails.push(
+      `${movie.number_of_seasons} season${
+        movie.number_of_seasons > 1 ? 's' : ''
+      }`
+    )
+    subDetails.push(`${movie.number_of_episodes} episodes`)
+  }
+
   return (
     <>
-      <style jsx>{`
-        .imagesContainer {
-          display: grid;
-          grid-template-columns: ${moviePage ? 'auto' : 'auto auto auto'};
-          margin-bottom: 40px;
-        }
-        .imageContainer {
-          display: inline-grid;
-          position: relative;
-        }
-        .imageContainer img {
-          width: 100%;
-          box-sizing: border-box;
-        }
-
-        .movieTitleContainer {
-          margin: 0 0 50px 20px;
-          z-index: 999;
-          display: inline-block;
-        }
-        .movieInfo {
-          padding-bottom: 10px;
-        }
-        .movieTitle {
-          margin: 0;
-        }
-        .movieTitle + a {
-          cursor: pointer;
-        }
-        .movieTitle a {
-          text-decoration: none;
-          color: inherit;
-        }
-        .movieTitle a:hover {
-          cursor: pointer;
-          // border-bottom: 2px solid;
-          text-decoration: none;
-          color: inherit;
-        }
-        .deleteButton {
-          margin-right: 50px;
-          font-size: 1rem;
-        }
-        .movieDetails {
-          margin-top: 20px;
-        }
-        .posterContainer {
-          padding-left: 20px;
-          padding-bottom: 30px;
-        }
-        .poster {
-          height: 250px;
-        }
-      `}</style>
       <div
         style={{
           display: `${deleted ? 'none' : 'block'}`,
@@ -120,8 +88,10 @@ export default (movieProps: IMovieProps) => {
               )}
             </h2>
             <div className='movieDetails'>
-              {(movie.first_air_date || movie.release_date).substring(0, 4)} /{' '}
-              {movie.genres.map(g => g.name).join(' / ')}
+              {details.join(' / ')}{' '}
+              <span className='movieSubDetails'>
+                — {subDetails.join(' / ')}
+              </span>
             </div>
           </div>
           {currentUser && (
@@ -141,7 +111,7 @@ export default (movieProps: IMovieProps) => {
                 }
                 return (
                   <div key={url} className='imageContainer'>
-                    <img src={url} />
+                    <img src={url} className='screen' />
                   </div>
                 )
               }
@@ -149,6 +119,69 @@ export default (movieProps: IMovieProps) => {
         </div>
         <br />
       </div>
+
+      <style jsx>{`
+        .screen {
+          min-height: calc(100vh / 3 / 2.5);
+        }
+        .imagesContainer {
+          display: grid;
+          grid-template-columns: ${moviePage ? 'auto' : 'auto auto auto'};
+          margin-bottom: 50px;
+        }
+        .imageContainer {
+          display: inline-grid;
+          position: relative;
+        }
+        .imageContainer img {
+          width: 100%;
+          box-sizing: border-box;
+        }
+
+        .movieTitleContainer {
+          margin: 0 0 20px 20px;
+          display: inline-block;
+        }
+        .movieInfo {
+          padding-bottom: 10px;
+        }
+        .movieTitle {
+          margin: 0;
+          opacity: 0.9;
+        }
+        .movieTitle + a {
+          cursor: pointer;
+        }
+        .movieTitle a {
+          text-decoration: none;
+          color: inherit;
+        }
+        .movieTitle a:hover {
+          text-decoration: underline;
+          cursor: pointer;
+          // border-bottom: 2px solid;
+          color: inherit;
+        }
+        .deleteButton {
+          margin-right: 50px;
+          font-size: 1rem;
+        }
+        .movieDetails {
+          margin-top: 10px;
+          opacity: 0.7;
+        }
+        .movieSubDetails {
+          opacity: 0.3;
+          white-space: pre;
+        }
+        .posterContainer {
+          padding-left: 20px;
+          padding-bottom: 30px;
+        }
+        .poster {
+          height: 250px;
+        }
+      `}</style>
     </>
   )
 }

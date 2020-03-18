@@ -7,6 +7,9 @@ export interface Movie {
   release_date?: string
   genres: Genre[]
   poster_path: string
+  runtime?: integer
+  number_of_seasons?: number
+  number_of_episodes?: number
 }
 
 export interface Genre {

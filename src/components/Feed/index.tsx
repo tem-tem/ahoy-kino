@@ -64,6 +64,7 @@ export default ({ initMovies, ELEMENTS_ON_PAGE }: Props) => {
       <style jsx>{`
         .loader {
           text-align: center;
+          padding: 20px;
         }
         .endMessage {
           text-align: center;

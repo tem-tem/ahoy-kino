@@ -15,6 +15,11 @@ const MoviePage: NextPage<Props> = props => {
     const description = `${(
       movie.first_air_date || movie.release_date
     ).substring(0, 4)} / ${movie.genres.map(g => g.name).join(' / ')}`
+
+    const imgUrl =
+      movie.screens.length > 1
+        ? movie.screens[4].publicUrls.thumb
+        : `https://image.tmdb.org/t/p/w780${movie.poster_path}`
     return (
       <div className='container'>
         <Head>
@@ -30,10 +35,8 @@ const MoviePage: NextPage<Props> = props => {
           />
           <meta property='og:title' content={movie.name} />
           <meta property='og:description' content={description} />
-          <meta
-            property='og:image'
-            content={movie.screens[4].publicUrls.thumb}
-          />
+          {imgUrl && <meta name='og:image' content={imgUrl} />}
+
           <meta property='og:image:width' content='1280' />
           <meta property='og:image:height' content='800' />
 
@@ -44,10 +47,7 @@ const MoviePage: NextPage<Props> = props => {
           />
           <meta name='twitter:title' content={movie.name} />
           <meta name='twitter:description' content={description} />
-          <meta
-            name='twitter:image'
-            content={movie.screens[4].publicUrls.thumb}
-          />
+          {imgUrl && <meta name='twitter:image' content={imgUrl} />}
         </Head>
 
         <main>
