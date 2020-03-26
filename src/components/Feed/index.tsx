@@ -1,15 +1,16 @@
 import { useContext, useState, useEffect, useCallback } from 'react'
 import { ConfigContext } from '../ConfigContext'
-import { Movie as MovieType } from '~/types'
+import { Movie as MovieType, AllMoviesStats } from '~/types'
 import MovieComponent from '~/components/Movie'
 import InfiniteScroll from 'react-infinite-scroller'
 
 interface Props {
   initMovies: MovieType[]
   ELEMENTS_ON_PAGE: number
+  stats: AllMoviesStats
 }
 
-export default ({ initMovies, ELEMENTS_ON_PAGE }: Props) => {
+export default ({ initMovies, ELEMENTS_ON_PAGE, stats }: Props) => {
   const { db } = useContext(ConfigContext)
   const [movies, setMovies] = useState<MovieType[]>(initMovies)
   const [lastMovie, setLast] = useState(null)
@@ -30,15 +31,12 @@ export default ({ initMovies, ELEMENTS_ON_PAGE }: Props) => {
           resolve: (val: { movies: MovieType[]; newLast: any }) => void,
           reject
         ) => {
-          console.log('start')
           db.collection('movies')
             .orderBy('createdAt')
             .startAfter(lastMovie)
             .limit(ELEMENTS_ON_PAGE)
             .get()
             .then(snaps => {
-              console.log(snaps.docs.length)
-
               if (snaps.docs.length > 0) {
                 const newMovies = []
                 snaps.forEach(movieDoc => {
@@ -71,7 +69,43 @@ export default ({ initMovies, ELEMENTS_ON_PAGE }: Props) => {
           padding: 40px;
           opacity: 0.7;
         }
+
+        .statsContainer {
+          display: flex;
+          justify-content: flex-end;
+        }
+        .stats {
+          display: inline-block;
+          padding: 50px 0 30px;
+          margin-right: 20px;
+          margin-bottom: 180px;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.192);
+        }
+        .statsTitle {
+          font-weight: 100;
+          margin: 0;
+          color: rgba(255, 255, 255, 0.9);
+        }
+        .statsTitle span {
+          font-weight: 900;
+          font-size: 4rem;
+          color: white;
+        }
+        .totalMovies {
+          text-align: right;
+          color: rgba(255, 255, 255, 0.7);
+        }
       `}</style>
+      <div className='statsContainer'>
+        <div className='stats'>
+          <h1 className='statsTitle'>
+            <span>{stats.totalAmount * 9}</span> screens
+          </h1>
+          <div className='totalMovies'>
+            from {stats.totalAmount} movies and shows
+          </div>
+        </div>
+      </div>
       <InfiniteScroll
         pageStart={0}
         initialLoad={false}

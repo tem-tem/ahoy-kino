@@ -27,3 +27,7 @@ export interface Screen {
   path: string
   order: number
 }
+
+export interface AllMoviesStats {
+  totalAmount: number
+}

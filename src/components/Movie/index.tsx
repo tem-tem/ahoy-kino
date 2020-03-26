@@ -117,12 +117,16 @@ export default (movieProps: IMovieProps) => {
               }
             })}
         </div>
+        <div style={{ textAlign: 'center', margin: 40, color: '#ffffff54' }}>
+          🌚
+        </div>
         <br />
       </div>
 
       <style jsx>{`
         .screen {
           min-height: calc(100vw / 3 / 2.5);
+          min-width: calc(100vw / 3);
         }
         .imagesContainer {
           display: grid;
@@ -157,7 +161,8 @@ export default (movieProps: IMovieProps) => {
           color: inherit;
         }
         .movieTitle a:hover {
-          text-decoration: underline;
+          border-bottom: 1px solid #ffffff7a;
+          // text-decoration: underline;
           cursor: pointer;
           // border-bottom: 2px solid;
           color: inherit;

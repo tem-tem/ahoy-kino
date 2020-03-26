@@ -1,16 +1,17 @@
 import Head from 'next/head'
 import Feed from '~/components/Feed'
 import { NextPage, NextPageContext } from 'next'
-import { Movie } from '~/types'
+import { Movie, AllMoviesStats } from '~/types'
 import loadFirebase from '~/lib/loadFirebase'
 
 interface Props {
   pageMovies?: Movie[]
   ELEMENTS_ON_PAGE: number
+  stats: AllMoviesStats
 }
 
 const Home: NextPage<Props> = props => {
-  const { pageMovies, ELEMENTS_ON_PAGE } = props
+  const { pageMovies, ELEMENTS_ON_PAGE, stats } = props
 
   return (
     <div className='container'>
@@ -36,7 +37,11 @@ const Home: NextPage<Props> = props => {
       </Head>
 
       <main>
-        <Feed initMovies={pageMovies} ELEMENTS_ON_PAGE={ELEMENTS_ON_PAGE} />
+        <Feed
+          initMovies={pageMovies}
+          ELEMENTS_ON_PAGE={ELEMENTS_ON_PAGE}
+          stats={stats}
+        />
       </main>
     </div>
   )
@@ -45,6 +50,15 @@ const Home: NextPage<Props> = props => {
 const getProps = () => async (props: NextPageContext) => {
   const db = loadFirebase().firestore()
   const ELEMENTS_ON_PAGE = 3
+
+  const stats = await new Promise((resolve: (data: AllMoviesStats) => void) => {
+    db.collection('movies')
+      .doc('--stats--')
+      .get()
+      .then(async snap => {
+        resolve((await snap.data()) as AllMoviesStats)
+      })
+  })
 
   const page = db
     .collection('movies')
@@ -59,7 +73,6 @@ const getProps = () => async (props: NextPageContext) => {
           snaps.forEach(movieDoc => {
             movies.push({ id: movieDoc.id, ...movieDoc.data() })
           })
-          // const last = snaps.docs[snaps.docs.length - 1]
           resolve(movies)
         }
         resolve([])
@@ -70,6 +83,7 @@ const getProps = () => async (props: NextPageContext) => {
   return {
     pageMovies,
     ELEMENTS_ON_PAGE,
+    stats,
   }
 }
 
