@@ -5,7 +5,6 @@ import Link from 'next/link'
 import Head from 'next/head'
 import '~/styles/global.css'
 import { ImgOProvider } from '~/components/ImageOverlay'
-import 'viewerjs/dist/viewer.css'
 import Modal from 'react-modal'
 Modal.setAppElement('#__next')
 
