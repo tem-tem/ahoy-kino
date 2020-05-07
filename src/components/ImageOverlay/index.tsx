@@ -7,7 +7,6 @@ import React, {
   useRef,
 } from 'react'
 import Modal from 'react-modal'
-import { disableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock'
 import styles from './styles.module.scss'
 
 interface IImgOverlay {
@@ -33,7 +32,6 @@ export const ImgOProvider = ({
     setImages(srcs)
     setTitle(newTitle)
     setOpen(true)
-    disableBodyScroll()
   }
 
   const handleArrowKeyPress = (event: KeyboardEvent) => {
@@ -79,7 +77,6 @@ export const ImgOProvider = ({
     setTitle('')
     // document.getElementsByTagName('html')[0].removeAttribute('style')
     setOpen(false)
-    clearAllBodyScrollLocks()
   }, [])
 
   const isOverlayOpen = useMemo(() => {
