@@ -19,7 +19,7 @@ export default ({ initMovies, ELEMENTS_ON_PAGE, stats }: Props) => {
     db.collection('movies')
       .doc(movies[movies.length - 1].id)
       .get()
-      .then(snap => {
+      .then((snap) => {
         setLast(snap)
       })
   }, [])
@@ -36,10 +36,10 @@ export default ({ initMovies, ELEMENTS_ON_PAGE, stats }: Props) => {
             .startAfter(lastMovie)
             .limit(ELEMENTS_ON_PAGE)
             .get()
-            .then(snaps => {
+            .then((snaps) => {
               if (snaps.docs.length > 0) {
                 const newMovies = []
-                snaps.forEach(movieDoc => {
+                snaps.forEach((movieDoc) => {
                   newMovies.push({ id: movieDoc.id, ...movieDoc.data() })
                 })
                 const newLast = snaps.docs[snaps.docs.length - 1]
@@ -50,7 +50,7 @@ export default ({ initMovies, ELEMENTS_ON_PAGE, stats }: Props) => {
         }
       )
       setLast(newPageMovies.newLast)
-      setMovies(olds => {
+      setMovies((olds) => {
         return [...olds, ...newPageMovies.movies]
       })
     }
@@ -97,14 +97,14 @@ export default ({ initMovies, ELEMENTS_ON_PAGE, stats }: Props) => {
         }
       `}</style>
       <div className='statsContainer'>
-        <div className='stats'>
+        {/* <div className='stats'>
           <h1 className='statsTitle'>
             <span>{stats.totalAmount * 9}</span> screens
           </h1>
           <div className='totalMovies'>
             from {stats.totalAmount} movies and shows
           </div>
-        </div>
+        </div> */}
       </div>
       <InfiniteScroll
         pageStart={0}
@@ -117,7 +117,7 @@ export default ({ initMovies, ELEMENTS_ON_PAGE, stats }: Props) => {
           </div>
         }
       >
-        {movies.map(movie => (
+        {movies.map((movie) => (
           <MovieComponent key={movie.id} movie={movie} />
         ))}
       </InfiniteScroll>

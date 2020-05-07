@@ -1,0 +1,82 @@
+.mainContainer {
+  display: flex;
+  justify-content: space-between;
+  padding: 20px;
+}
+.screen {
+  min-height: calc(100vw / 3 / 2.5);
+  min-width: calc(100vw / 3);
+  cursor: pointer;
+}
+.imagesContainer {
+  display: grid;
+  grid-template-columns: auto auto auto;
+  margin-bottom: 50px;
+}
+.imageContainer {
+  display: inline-grid;
+  position: relative;
+}
+.imageContainer img {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.movieTitleContainer {
+  // margin: 0 0 20px 20px;
+  display: inline-block;
+}
+.movieInfo {
+  padding-bottom: 10px;
+}
+.movieTitle {
+  margin: 0;
+  opacity: 0.9;
+}
+.movieTitle + a {
+  cursor: pointer;
+}
+.movieTitle a {
+  text-decoration: none;
+  color: inherit;
+}
+.movieTitle a:hover {
+  border-bottom: 1px solid #ffffff7a;
+  // text-decoration: underline;
+  cursor: pointer;
+  // border-bottom: 2px solid;
+  color: inherit;
+}
+.deleteButton {
+  margin-right: 50px;
+  font-size: 1rem;
+}
+.movieDetails {
+  margin-top: 10px;
+  opacity: 0.7;
+}
+.movieSubDetails {
+  opacity: 0.3;
+  white-space: pre;
+}
+.posterContainer {
+  padding-left: 20px;
+  padding-bottom: 30px;
+}
+.poster {
+  height: 250px;
+}
+
+@media only screen and (max-width: 425px) {
+  .mainContainer {
+    display: table;
+  }
+  .movieTitleContainer {
+    display: table-footer-group;
+  }
+  .posterContainer {
+    display: table-header-group;
+    padding: 0;
+    padding-bottom: 30px;
+  }
+}

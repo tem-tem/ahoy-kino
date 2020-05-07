@@ -1,19 +1,33 @@
-import React, { useContext, useCallback, useState, useEffect } from 'react'
+import React, { useContext, useCallback, useState } from 'react'
 import { Movie } from '~/types'
 import { ConfigContext } from '../ConfigContext'
 import Router from 'next/router'
 import Link from 'next/link'
+import Genres from '../Genres'
+import styles from './styles.module.scss'
+import { ImgOContext } from '../ImageOverlay'
 import Screens from '../Screens'
 
 interface IMovieProps {
   movie: Movie
+  moviePage?: boolean
 }
 
 export default (movieProps: IMovieProps) => {
-  const { movie } = movieProps
+  const { movie, moviePage } = movieProps
   const { currentUser, db } = useContext(ConfigContext)
+  const { open: openImgO } = useContext(ImgOContext)
   const [deleted, setDeleted] = useState(false)
+  // const deleteMovie = () => deleteById(movie.id)
   const screenshots = []
+
+  const handleImageClick = (
+    e: React.MouseEvent<HTMLImageElement, MouseEvent>
+  ) => {
+    const index = Number(e.currentTarget.getAttribute('data-img-index'))
+    const images = movie.screens.map((s) => s.publicUrls.full)
+    openImgO(images, index, movie.name)
+  }
 
   for (let i = 0; i < movie.screens.length; i++) {
     screenshots.push(movie.screens.find((s) => s.order === i))
@@ -36,6 +50,8 @@ export default (movieProps: IMovieProps) => {
       deleteFromDB(movie.id)
     }
   }, [movie])
+
+  const getPosterPath = (path) => `https://image.tmdb.org/t/p/w1280${path}`
 
   const details = [
     (movie.first_air_date || movie.release_date).substring(0, 4),
@@ -60,6 +76,7 @@ export default (movieProps: IMovieProps) => {
     subDetails.push(`${movie.number_of_episodes} episodes`)
   }
 
+  console.log(movie)
   // TODO: move posters to styles.module.scss
   // TODO: make a screen viewer modal
   return (
@@ -69,25 +86,41 @@ export default (movieProps: IMovieProps) => {
           display: `${deleted ? 'none' : 'block'}`,
         }}
       >
-        <div className='movieTitleContainer flex-between'>
-          <div className='movieInfo'>
-            <h2 className='movieTitle'>
-              <Link href='/[directLink]' as={movie.directLink}>
-                <a>{movie.name}</a>
-              </Link>
-            </h2>
-            <div className='movieDetails'>
-              {details.join(' / ')}{' '}
-              <span className='movieSubDetails'>
-                — {subDetails.join(' / ')}
-              </span>
+        <div className={styles.mainContainer}>
+          <div className={styles.movieTitleContainer}>
+            <div className={styles.movieInfo}>
+              <h2 className={styles.movieTitle}>
+                <div>{movie.name}</div>
+              </h2>
+              <div className={styles.movieDetails}>
+                <Genres genres={movie.genres} />
+                {/* {details.join(' / ')}{' '} */}
+                <span className={styles.movieSubDetails}>
+                  {subDetails.join(' / ')}
+                </span>
+                <div>
+                  Release Date: {movie.release_date || movie.first_air_date}
+                </div>
+                <div>Ahoy Rating: ???</div>
+                <div>Average Rating: {movie.vote_average}</div>
+                <div>Popularity: {movie.popularity}</div>
+                <div>Status: {movie.status}</div>
+                <div>Overview: {movie.overview}</div>
+              </div>
             </div>
-          </div>
-          {currentUser && (
-            <button className='deleteButton' onClick={deleteMovie}>
+            {/* {currentUser && (
+            <button className={styles.deleteButton} onClick={deleteMovie}>
               Delete
             </button>
-          )}
+          )} */}
+          </div>
+          <div className={styles.posterContainer}>
+            <img
+              src={getPosterPath(movie.poster_path)}
+              alt='poster'
+              className={styles.poster}
+            />
+          </div>
         </div>
 
         <Screens screens={movie.screens} title={movie.name} />
@@ -97,53 +130,6 @@ export default (movieProps: IMovieProps) => {
         </div>
         <br />
       </div>
-
-      <style jsx>{`
-        .movieTitleContainer {
-          margin: 0 0 20px 20px;
-          display: inline-block;
-        }
-        .movieInfo {
-          padding-bottom: 10px;
-        }
-        .movieTitle {
-          margin: 0;
-          opacity: 0.9;
-        }
-        .movieTitle + a {
-          cursor: pointer;
-        }
-        .movieTitle a {
-          text-decoration: none;
-          color: inherit;
-        }
-        .movieTitle a:hover {
-          border-bottom: 1px solid #ffffff7a;
-          // text-decoration: underline;
-          cursor: pointer;
-          // border-bottom: 2px solid;
-          color: inherit;
-        }
-        .deleteButton {
-          margin-right: 50px;
-          font-size: 1rem;
-        }
-        .movieDetails {
-          margin-top: 10px;
-          opacity: 0.7;
-        }
-        .movieSubDetails {
-          opacity: 0.3;
-          white-space: pre;
-        }
-        .posterContainer {
-          padding-left: 20px;
-          padding-bottom: 30px;
-        }
-        .poster {
-          height: 250px;
-        }
-      `}</style>
     </>
   )
 }

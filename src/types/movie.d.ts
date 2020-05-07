@@ -10,6 +10,11 @@ export interface Movie {
   runtime?: integer
   number_of_seasons?: number
   number_of_episodes?: number
+  overview: string
+  status: string
+  popularity: number
+  vote_average: number
+  release_date: string
 }
 
 export interface Genre {

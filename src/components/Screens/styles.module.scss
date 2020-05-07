@@ -1,0 +1,17 @@
+.container {
+  display: grid;
+  grid-template-columns: auto auto auto;
+  margin-bottom: 50px;
+}
+
+.container img {
+  display: inline-grid;
+  position: relative;
+
+  width: 100%;
+  box-sizing: border-box;
+
+  min-height: calc(100vw / 3 / 2.5);
+  min-width: calc(100vw / 3);
+  cursor: pointer;
+}

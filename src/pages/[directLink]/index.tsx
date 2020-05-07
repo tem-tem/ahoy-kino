@@ -1,6 +1,6 @@
 import Head from 'next/head'
-import Movie from '~/components/Movie'
 import makeLink from '~/helpers/makeLink'
+import MoviePageComponent from '~/components/Movie/MoviePage'
 import { NextPage, NextPageContext } from 'next'
 import loadFirebase from '~/lib/loadFirebase'
 import { Movie as MovieType } from '~/types'
@@ -9,12 +9,12 @@ interface Props {
   movieData?: MovieType
 }
 
-const MoviePage: NextPage<Props> = props => {
+const MoviePage: NextPage<Props> = (props) => {
   const { movieData: movie } = props
   if (movie) {
     const description = `${(
       movie.first_air_date || movie.release_date
-    ).substring(0, 4)} / ${movie.genres.map(g => g.name).join(' / ')}`
+    ).substring(0, 4)} / ${movie.genres.map((g) => g.name).join(' / ')}`
 
     const imgUrl =
       movie.screens.length > 1
@@ -51,7 +51,7 @@ const MoviePage: NextPage<Props> = props => {
         </Head>
 
         <main>
-          {movie && <Movie movie={movie} moviePage={true} />}
+          {movie && <MoviePageComponent movie={movie} />}
           {!movie && 'Movie Not Found'}
         </main>
       </div>
@@ -71,18 +71,18 @@ const getProps = () => async (props: NextPageContext) => {
         db.collection('movies')
           .where('directLink', '==', makeLink(directLink.toString()))
           .get()
-          .then(querySnapshot => {
+          .then((querySnapshot) => {
             if (res && querySnapshot.size === 0) {
               res.statusCode = 404
               res.end('Not found')
               reject()
             }
-            querySnapshot.forEach(doc => {
+            querySnapshot.forEach((doc) => {
               const movie = { id: doc.id, ...(doc.data() as MovieType) }
               resolve(movie)
             })
           })
-          .catch(error => {
+          .catch((error) => {
             reject(error)
           })
       }
