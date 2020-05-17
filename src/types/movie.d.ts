@@ -15,6 +15,7 @@ export interface Movie {
   popularity: number
   vote_average: number
   release_date: string
+  tmdb_id: string
 }
 
 export interface Genre {

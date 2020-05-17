@@ -4,10 +4,12 @@ import MoviePageComponent from '~/components/Movie/MoviePage'
 import { NextPage, NextPageContext } from 'next'
 import loadFirebase from '~/lib/loadFirebase'
 import { Movie as MovieType } from '~/types'
+import fetch from 'node-fetch'
 
 interface Props {
   movieData?: MovieType
 }
+const apiKey = process.env.TMDB_KEY
 
 const MoviePage: NextPage<Props> = (props) => {
   const { movieData: movie } = props
@@ -88,6 +90,26 @@ const getProps = () => async (props: NextPageContext) => {
       }
     )
 
+    const poster = await new Promise((resolve, reject) =>
+      fetch(`https://api.themoviedb.org/3/${
+        movieData.first_air_date ? 'tv' : 'movie'
+      }/${movieData.tmdb_id}?api_key=${apiKey}
+  `)
+        .then((response) => {
+          return response.json()
+        })
+        .then((data) => {
+          if (data) {
+            resolve(data.poster_path)
+            return
+          }
+          reject('fuck')
+        })
+    )
+
+    if (poster !== 'fuck') {
+      movieData.poster_path = poster as string
+    }
     return { movieData }
   }
   return { movieData: null }
