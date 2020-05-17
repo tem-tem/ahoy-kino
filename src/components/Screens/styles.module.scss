@@ -12,6 +12,6 @@
   box-sizing: border-box;
 
   min-height: calc(100vw / 3 / 2.5);
-  min-width: calc(100vw / 3);
+  max-width: calc(100vw / 3);
   cursor: pointer;
 }
