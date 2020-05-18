@@ -14,7 +14,7 @@ Firebase.
 
 как выполнено:
 
-1. [Найти фильм из themoviedb.org](#search-themoviedb.org) (возвращается объект `movie`, без [screens](#screens))
+1. [Найти фильм из themoviedb.org](#search-themoviedborg) (возвращается объект `movie`, без [screens](#screens))
 1. Загрузка скринов (возвращается массив [screens](#screens) с названиями файлов и его порядком)
    - Загрузить скрины на firestore storage
    - Firestore Functions отлавливает загрузку скринов и вызывает ImageResizer. Она уменьшает пикчу и сохраняет с таким названием: `<имя_файла>_500x500`
