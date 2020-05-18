@@ -91,15 +91,15 @@ Firebase.
   revenue: 1065659812,
   runtime: 151,
   screens: [
-    { name: '58-212261897384', order: 0, publicUrls: [Object] },
-    { name: '58-1403189175856', order: 1, publicUrls: [Object] },
-    { name: '58-301401898027', order: 2, publicUrls: [Object] },
-    { name: '58-1207329826361', order: 3, publicUrls: [Object] },
-    { name: '58-471896972608', order: 4, publicUrls: [Object] },
-    { name: '58-1459384231775', order: 5, publicUrls: [Object] },
-    { name: '58-1497253194956', order: 6, publicUrls: [Object] },
-    { name: '58-1186980412131', order: 7, publicUrls: [Object] },
-    { name: '58-826517660513', order: 8, publicUrls: [Object] }
+    {
+      name: string, // имя должно быть уникальным (как делаю сейчас: `id` фильма из themovie.org + рандом uuid)
+      order: number, // порядок даю из фронта
+      publicUrls: {
+        thumb: `https://firebasestorage.googleapis.com/v0/b/ahoy-kino.appspot.com/o/screens%2Fthumbs%2F${fileName}_500x500?alt=media`,
+        full: `https://firebasestorage.googleapis.com/v0/b/ahoy-kino.appspot.com/o/screens%2F${fileName}?alt=media`,
+      },
+    },
+    ...
   ],
   spoken_languages: [
     { iso_639_1: 'en', name: 'English' },
