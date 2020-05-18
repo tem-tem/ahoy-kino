@@ -18,8 +18,8 @@ class MyDocument extends Document {
         <style>{`
           body {
             background:
-              linear-gradient(90deg, black 99px, transparent 1%) center,
-              linear-gradient(black 99px, transparent 1%) center,
+              linear-gradient(90deg, #0e0e0e 99px, transparent 1%) center,
+              linear-gradient(#0e0e0e 99px, transparent 1%) center,
               #7b7b7b;
             background-size: 100px 100px;
           }
