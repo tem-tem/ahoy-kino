@@ -37,7 +37,6 @@ function MyApp({ Component, pageProps }) {
         </Head>
         <Auth />
         <div className='main-logo-container'>
-          <div />
           <Link href='/'>
             <h1 className='main-logo'>ahoy-kino</h1>
           </Link>

@@ -11,9 +11,9 @@ export default () => {
       .signOut()
       .then(() => {
         // Sign-out successful.
-        console.log('logout succ')
+        console.debug('logout succ')
       })
-      .catch(error => {
+      .catch((error) => {
         console.error(error)
         // An error happened.
       })
@@ -30,6 +30,8 @@ export default () => {
       <style jsx>{`
         .headerContainer {
           padding: 20px 50px;
+          position: absolute;
+          z-index: 999999;
         }
       `}</style>
       <div className='flex-between headerContainer'>

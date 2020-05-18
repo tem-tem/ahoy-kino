@@ -1,12 +1,11 @@
-import React, { useContext, useCallback, useState } from 'react'
+import React, { useContext, useCallback, useState, useEffect } from 'react'
 import { Movie } from '~/types'
 import { ConfigContext } from '../ConfigContext'
 import Router from 'next/router'
-import Link from 'next/link'
 import Genres from '../Genres'
 import styles from './styles.module.scss'
-import { ImgOContext } from '../ImageOverlay'
 import Screens from '../Screens'
+import Vibrant from 'node-vibrant'
 
 interface IMovieProps {
   movie: Movie
@@ -14,20 +13,12 @@ interface IMovieProps {
 }
 
 export default (movieProps: IMovieProps) => {
-  const { movie, moviePage } = movieProps
-  const { currentUser, db } = useContext(ConfigContext)
-  const { open: openImgO } = useContext(ImgOContext)
+  const { movie } = movieProps
+  const { db } = useContext(ConfigContext)
   const [deleted, setDeleted] = useState(false)
-  // const deleteMovie = () => deleteById(movie.id)
+  const [accent, setAccent] = useState('')
+  const [titleStyle, setTitleStyle] = useState(styles.neonTitle)
   const screenshots = []
-
-  const handleImageClick = (
-    e: React.MouseEvent<HTMLImageElement, MouseEvent>
-  ) => {
-    const index = Number(e.currentTarget.getAttribute('data-img-index'))
-    const images = movie.screens.map((s) => s.publicUrls.full)
-    openImgO(images, index, movie.name)
-  }
 
   for (let i = 0; i < movie.screens.length; i++) {
     screenshots.push(movie.screens.find((s) => s.order === i))
@@ -53,11 +44,21 @@ export default (movieProps: IMovieProps) => {
 
   const getPosterPath = (path) => `https://image.tmdb.org/t/p/w1280${path}`
 
-  const details = [
-    (movie.first_air_date || movie.release_date).substring(0, 4),
-    `${movie.first_air_date ? 'Series' : 'Movie'}`,
-    movie.genres.map((g) => g.name).join(' / '),
-  ]
+  const getAccentColor = async (pic) => {
+    const a = await new Promise((resolve: (val: number[]) => void) =>
+      Vibrant.from(pic)
+        .getPalette()
+        .then((palette) => resolve(palette.Vibrant.rgb))
+    )
+    return a
+  }
+
+  useEffect(() => {
+    getAccentColor(getPosterPath(movie.poster_path)).then((a) =>
+      setAccent(a.join(','))
+    )
+    setTitleStyle(`${styles.neonTitle} accent`)
+  }, [])
 
   const subDetails = []
   if (movie.runtime) {
@@ -76,9 +77,6 @@ export default (movieProps: IMovieProps) => {
     subDetails.push(`${movie.number_of_episodes} episodes`)
   }
 
-  console.log(movie)
-  // TODO: move posters to styles.module.scss
-  // TODO: make a screen viewer modal
   return (
     <>
       <div
@@ -89,39 +87,52 @@ export default (movieProps: IMovieProps) => {
         <div className={styles.mainContainer}>
           <div className={styles.movieTitleContainer}>
             <div className={styles.movieInfo}>
-              <h2 className={styles.movieTitle}>
+              <h2 className={`${titleStyle}`}>{movie.name}</h2>
+              {/* <h2 className={styles.movieTitle}>
                 <div>{movie.name}</div>
-              </h2>
+              </h2> */}
               <div className={styles.movieDetails}>
+                <div className={styles.overview}>{movie.overview}</div>
+
                 <Genres genres={movie.genres} />
-                {/* {details.join(' / ')}{' '} */}
-                <span className={styles.movieSubDetails}>
-                  {subDetails.join(' / ')}
-                </span>
-                <div>
-                  Release Date: {movie.release_date || movie.first_air_date}
-                </div>
-                <div>Ahoy Rating: ???</div>
-                <div>Average Rating: {movie.vote_average}</div>
-                <div>Popularity: {movie.popularity}</div>
-                <div>Status: {movie.status}</div>
-                <div>Overview: {movie.overview}</div>
               </div>
             </div>
-            {/* {currentUser && (
-            <button className={styles.deleteButton} onClick={deleteMovie}>
-              Delete
-            </button>
-          )} */}
           </div>
-          <div className={styles.posterContainer}>
-            <img
-              src={getPosterPath(movie.poster_path)}
-              alt='poster'
-              className={styles.poster}
-            />
+          <div>
+            <div className={`${styles.posterContainer} posterAccent`}>
+              <img
+                src={getPosterPath(movie.poster_path)}
+                alt='poster'
+                className={styles.poster}
+              />
+              {/* <div>Ahoy Rating: ???</div> */}
+            </div>
+
+            <div className={styles.subPosterDetails}>
+              <span className={styles.movieSubDetails}>
+                {subDetails.join(' / ')}
+              </span>
+              <div>Status: {movie.status}</div>
+
+              <span style={{ display: 'block' }}>
+                {new Date(
+                  movie.release_date || movie.first_air_date
+                ).toLocaleDateString('en-US', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                })}
+              </span>
+
+              <div>Average Rating: {movie.vote_average}</div>
+              <div>Popularity: {movie.popularity}</div>
+            </div>
           </div>
         </div>
+
+        {/* <div className={styles.lineContainer}>
+          <div className={styles.line}>{movie.overview}</div>
+        </div> */}
 
         <Screens screens={movie.screens} title={movie.name} />
 
@@ -130,6 +141,16 @@ export default (movieProps: IMovieProps) => {
         </div>
         <br />
       </div>
+      <style jsx>{`
+        .accent {
+          // text-shadow: 0px 1px 20px rgb(${accent});
+          // -webkit-text-stroke: 1px rgb(${accent});
+          color: rgb(${accent});
+        }
+        .posterAccent {
+          box-shadow: 10px 10px 0 rgb(${accent});
+        }
+      `}</style>
     </>
   )
 }
