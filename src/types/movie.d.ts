@@ -25,7 +25,13 @@ export interface Genre {
 
 export interface Screen {
   name: string
+  // remove below
   publicUrls: {
+    thumb: string
+    full: string
+  }
+  // remove above
+  public_urls: {
     thumb: string
     full: string
   }

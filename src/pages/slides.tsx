@@ -1,37 +1,23 @@
 import Head from 'next/head'
 import Feed from '~/components/Feed'
+import fetch from 'node-fetch'
 import { NextPage, NextPageContext } from 'next'
 import { Movie, AllMoviesStats } from '~/types'
 import loadFirebase from '~/lib/loadFirebase'
-import { useQuery, gql } from '@apollo/client'
-
-const MOVIES = gql`
-  query {
-    movies(movieCount: 5, page: 1) {
-      name
-      screens {
-        public_urls {
-          thumb
-        }
-      }
-    }
-  }
-`
+import Slider from '~/components/Slider'
 
 interface Props {
-  pageMovies?: Movie[]
-  ELEMENTS_ON_PAGE: number
-  stats: AllMoviesStats
+  initMovies?: { data: { movies: Movie[] } }
 }
 
-const Home: NextPage<Props> = (props) => {
-  const { pageMovies, ELEMENTS_ON_PAGE, stats } = props
-  const { loading, error, data } = useQuery(MOVIES)
+const Slides: NextPage<Props> = (props) => {
+  const { initMovies } = props
+  // const { loading, error, data } = useQuery(MOVIES)
 
-  if (loading) return <p>Loading...</p>
-  if (error) return <p>Error :(</p>
+  // if (loading) return <p>Loading...</p>
+  // if (error) return <p>Error :(</p>
 
-  console.log(data)
+  // console.log(data)
 
   return (
     <div className='container'>
@@ -57,56 +43,43 @@ const Home: NextPage<Props> = (props) => {
       </Head>
 
       <main>
-        <Feed
+        <Slider initMovies={initMovies} />
+        {/* <Feed
           initMovies={pageMovies}
           ELEMENTS_ON_PAGE={ELEMENTS_ON_PAGE}
           stats={stats}
-        />
+        /> */}
       </main>
     </div>
   )
 }
 
 const getProps = () => async (props: NextPageContext) => {
-  const db = loadFirebase().firestore()
-  const ELEMENTS_ON_PAGE = 3
-
-  const stats = await new Promise((resolve: (data: AllMoviesStats) => void) => {
-    db.collection('movies')
-      .doc('--stats--')
-      .get()
-      .then(async (snap) => {
-        resolve((await snap.data()) as AllMoviesStats)
-      })
-  })
-
-  const page = db
-    .collection('movies')
-    .orderBy('createdAt')
-    .limit(ELEMENTS_ON_PAGE)
-
-  const pageMovies = await new Promise(
-    (resolve: (val: Movie[]) => void, reject) => {
-      page.get().then((snaps) => {
-        if (snaps.docs.length > 0) {
-          const movies = []
-          snaps.forEach((movieDoc) => {
-            movies.push({ id: movieDoc.id, ...movieDoc.data() })
-          })
-          resolve(movies)
+  const url = 'http://api.ahoy.tem-tem.com/graphql'
+  const query = `query {
+    movies(movieCount: 5, page: 1) {
+      name
+      screens {
+        public_urls {
+          thumb
+          full
         }
-        resolve([])
-      })
+      }
     }
-  )
+  }`
+
+  const movies = await fetch(url, {
+    method: 'POST',
+    body: JSON.stringify({ query }),
+  }).then((r) => r.json())
+
+  console.log(movies)
 
   return {
-    pageMovies,
-    ELEMENTS_ON_PAGE,
-    stats,
+    initMovies: movies,
   }
 }
 
-Home.getInitialProps = getProps()
+Slides.getInitialProps = getProps()
 
-export default Home
+export default Slides

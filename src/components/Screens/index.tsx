@@ -10,7 +10,7 @@ interface Props {
 
 export default ({ screens, title }: Props) => {
   const { open: openImgO } = useContext(ImgOContext)
-  const full = screens.map((s) => s.publicUrls.full)
+  const full = screens.map((s) => s.public_urls.full)
 
   const handleImageClick = useCallback(
     (e: React.MouseEvent<HTMLImageElement, MouseEvent>) => {
@@ -24,8 +24,8 @@ export default ({ screens, title }: Props) => {
 
   const imgTags = screens.map((s, index) => (
     <img
-      src={s.publicUrls.thumb}
-      key={s.publicUrls.thumb}
+      src={s.public_urls.thumb}
+      key={s.public_urls.thumb}
       onClick={handleImageClick}
       data-img-index={index}
     />

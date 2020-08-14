@@ -13,6 +13,7 @@ const apiKey = process.env.TMDB_KEY
 
 const MoviePage: NextPage<Props> = (props) => {
   const { movieData: movie } = props
+  console.log(movie)
   if (movie) {
     const description = `${(
       movie.first_air_date || movie.release_date

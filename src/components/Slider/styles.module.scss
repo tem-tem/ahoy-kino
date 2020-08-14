@@ -1,0 +1,21 @@
+.slideContainer {
+  width: 100vw;
+  // height: 100vh;
+  min-height: 100vh;
+  /* mobile viewport bug fix */
+  min-height: -webkit-fill-available;
+  background-color: grey;
+  transition: 0.8s;
+  position: absolute;
+}
+
+.scrollState {
+  position: fixed;
+  z-index: -1;
+  width: 2px;
+  bottom: 0;
+  background-color: #c134cc;
+  box-shadow: 0px 0px 2px 0px #ff1afd;
+  transition: width 0.3s;
+  height: 0;
+}

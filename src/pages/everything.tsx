@@ -3,20 +3,6 @@ import Feed from '~/components/Feed'
 import { NextPage, NextPageContext } from 'next'
 import { Movie, AllMoviesStats } from '~/types'
 import loadFirebase from '~/lib/loadFirebase'
-import { useQuery, gql } from '@apollo/client'
-
-const MOVIES = gql`
-  query {
-    movies(movieCount: 5, page: 1) {
-      name
-      screens {
-        public_urls {
-          thumb
-        }
-      }
-    }
-  }
-`
 
 interface Props {
   pageMovies?: Movie[]
@@ -24,14 +10,8 @@ interface Props {
   stats: AllMoviesStats
 }
 
-const Home: NextPage<Props> = (props) => {
+const Everything: NextPage<Props> = (props) => {
   const { pageMovies, ELEMENTS_ON_PAGE, stats } = props
-  const { loading, error, data } = useQuery(MOVIES)
-
-  if (loading) return <p>Loading...</p>
-  if (error) return <p>Error :(</p>
-
-  console.log(data)
 
   return (
     <div className='container'>
@@ -107,6 +87,6 @@ const getProps = () => async (props: NextPageContext) => {
   }
 }
 
-Home.getInitialProps = getProps()
+Everything.getInitialProps = getProps()
 
-export default Home
+export default Everything
