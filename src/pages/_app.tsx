@@ -30,7 +30,10 @@ function MyApp({ Component, pageProps }) {
   const gqlClient = new ApolloClient({
     // uri: 'http://localhost:3000/graphql',
 
-    link: new HttpLink({ uri: 'http://api.ahoy.tem-tem.com/graphql', fetch }),
+    link: new HttpLink({
+      uri: 'http://api.ahoy.tem-tem.com/graphql',
+      fetch,
+    }),
     cache: new InMemoryCache(),
   })
 

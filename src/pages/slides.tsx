@@ -1,23 +1,66 @@
 import Head from 'next/head'
-import Feed from '~/components/Feed'
 import fetch from 'node-fetch'
 import { NextPage, NextPageContext } from 'next'
 import { Movie, AllMoviesStats } from '~/types'
-import loadFirebase from '~/lib/loadFirebase'
 import Slider from '~/components/Slider'
+import { useState, useCallback, useEffect } from 'react'
+
+// fullList -- big list of movies (it loads 1000 items)
+//    it's used in combination with BLOCK_LENGTH, and lMark:
+//    starting with the index of lMark, the BLOCK_LENGTH amount of items is considered as a BLOCK of slides
+//    TODO: create a pagination for it?
+// BLOCK_LENGTH -- size of the block
+// lMark -- index of the current block's first item
+// currentBlock -- this block is used in Slider
 
 interface Props {
   initMovies?: { data: { movies: Movie[] } }
 }
 
+const BLOCK_LENGTH = 5
+
 const Slides: NextPage<Props> = (props) => {
   const { initMovies } = props
-  // const { loading, error, data } = useQuery(MOVIES)
+  const [fullList] = useState(initMovies.data.movies)
+  const [lMark, setLMark] = useState(0)
+  const [currentBlock, setCurrentBlock] = useState(
+    fullList.slice(lMark, lMark + BLOCK_LENGTH)
+  )
 
-  // if (loading) return <p>Loading...</p>
-  // if (error) return <p>Error :(</p>
+  useEffect(() => {
+    setCurrentBlock(fullList.slice(lMark, lMark + BLOCK_LENGTH))
+  }, [lMark])
 
-  // console.log(data)
+  const setNextBlock = useCallback(
+    (slideNumber) => {
+      if (
+        slideNumber === BLOCK_LENGTH - 1 &&
+        lMark <= fullList.length - BLOCK_LENGTH
+      ) {
+        // slideNumber is at the right edge -- no next slide
+        // moving lMark to load next block of slides
+        setLMark((old) => old + BLOCK_LENGTH)
+        return true
+      }
+      // no need to load next block of slides
+      return false
+    },
+    [lMark, fullList]
+  )
+
+  const setPrevBlock = useCallback(
+    (slideNumber) => {
+      if (slideNumber === 0 && lMark >= BLOCK_LENGTH) {
+        // slideNumber is at the left edge -- no previous slide
+        // moving lMark to the lefft, to load previous block of slides
+        setLMark((old) => old - BLOCK_LENGTH)
+        return true
+      }
+      // no need to load previous block of slides
+      return false
+    },
+    [lMark]
+  )
 
   return (
     <div className='container'>
@@ -43,12 +86,11 @@ const Slides: NextPage<Props> = (props) => {
       </Head>
 
       <main>
-        <Slider initMovies={initMovies} />
-        {/* <Feed
-          initMovies={pageMovies}
-          ELEMENTS_ON_PAGE={ELEMENTS_ON_PAGE}
-          stats={stats}
-        /> */}
+        <Slider
+          movies={currentBlock}
+          setNextBlock={setNextBlock}
+          setPrevBlock={setPrevBlock}
+        />
       </main>
     </div>
   )
@@ -57,8 +99,12 @@ const Slides: NextPage<Props> = (props) => {
 const getProps = () => async (props: NextPageContext) => {
   const url = 'http://api.ahoy.tem-tem.com/graphql'
   const query = `query {
-    movies(movieCount: 5, page: 1) {
+    movies(movieCount: 1000, page: 1) {
       name
+      genres {
+        name
+      }
+      release_date
       screens {
         public_urls {
           thumb
@@ -83,3 +129,65 @@ const getProps = () => async (props: NextPageContext) => {
 Slides.getInitialProps = getProps()
 
 export default Slides
+
+// const [movies, setmovies] = useState<Movie[]>(initMovies.data.movies)
+
+// const [page, setPage] = useState(2)
+
+// const moviesQuery = gql`
+//   query Movies($page: Int!) {
+//     movies(movieCount: 5, page: $page) {
+//       name
+//       genres {
+//         name
+//       }
+//       release_date
+//       screens {
+//         public_urls {
+//           thumb
+//           full
+//         }
+//       }
+//     }
+//   }
+// `
+// const { loading, error, data: moviesPage, fetchMore } = useQuery(
+//   moviesQuery,
+//   {
+//     variables: {
+//       page,
+//     },
+//     fetchPolicy: 'cache-and-network',
+//   }
+// )
+
+// const loadNewPage = () =>
+//   fetchMore({
+//     variables: {
+//       page: moviesPage.movies.length / 5 + 1,
+//     },
+//     updateQuery: (prevPage, { fetchMoreResult }) => {
+//       console.log('fetchMoreResult', fetchMoreResult)
+//       if (!fetchMoreResult) return prevPage
+//       return {
+//         ...prevPage,
+//         ...{ movies: [...prevPage.movies, ...fetchMoreResult.movies] },
+//       }
+//       // return Object.assign({}, prevPage, {
+//       //   feed: [...prevPage.movies, ...fetchMoreResult.movies],
+//       // })
+//     },
+//   })
+
+// console.log('error', error)
+// console.log('newPageMovies', newPageMovies)
+
+// useEffect(() => {
+//   if (movies) {
+//     console.log('newPageMovies', movies)
+//     setmovies((old) => [...movies.movies, ...old])
+//   }
+// }, [movies])
+
+// if (loading) return <p>Loading...</p>
+// if (error) return <p>Error :(</p>

@@ -1,114 +1,108 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import styles from './styles.module.scss'
 import { Movie } from '~/types'
-import { useQuery, gql } from '@apollo/client'
 import Screens from '../Screens'
+import { motion, AnimatePresence, useAnimation } from 'framer-motion'
 
 const SCROLL_STRENGTH = 500
 const SCROLL_HOLD_TIME = 500
 
 interface ISlider {
-  initMovies: { data: { movies: Movie[] } }
+  movies: Movie[]
+  setNextBlock?: (currentSlideNumber: number) => boolean
+  setPrevBlock?: (currentSlideNumber: number) => boolean
 }
 
 export default (props: ISlider) => {
-  // TODO: deal with pagination
-  // TODO: use real data
-  const { initMovies } = props
-  const [allMovies, setAllMovies] = useState<Movie[]>(initMovies.data.movies)
-
-  const [page, setPage] = useState(2)
-
-  const moviesQuery = gql`
-    query {
-      movies(movieCount: 5, page: ${page}) {
-        name
-        screens {
-          public_urls {
-            thumb,
-            full
-          }
-        }
-      }
-    }
-  `
-  const { loading, error, data: newPageMovies } = useQuery(moviesQuery)
-
-  console.log(error)
-  useEffect(() => {
-    if (newPageMovies) {
-      console.log(newPageMovies.data)
-      setAllMovies((old) => [...old, ...newPageMovies.data.movies])
-    }
-  }, [newPageMovies])
-
-  // if (loading) return <p>Loading...</p>
-  // if (error) return <p>Error :(</p>
-
+  const { movies, setNextBlock, setPrevBlock } = props
   const [currentSlide, setCurrentSlide] = useState(0)
-  const [isFirst, setFirst] = useState(true)
-  const [isLast, setLast] = useState(false)
+  const controls = useAnimation()
 
-  // const data = ['grey', 'yellow', 'green', 'blue', 'orange', 'pink']
-
-  const next = () => {
-    console.log('next')
-    setCurrentSlide((old) =>
-      currentSlide === allMovies.length - 1 ? old : old + 1
-    )
-  }
-  const prev = () => {
-    console.log('prev')
-    setCurrentSlide((old) => (currentSlide === 0 ? old : old - 1))
-  }
   useEffect(() => {
-    console.log('currentSlide', currentSlide)
-    setFirst(false)
-    setLast(false)
-    if (currentSlide === 0) {
-      setFirst(true)
-    }
-    if (currentSlide === allMovies.length - 1) {
-      setLast(true)
+    // framer-motion animation hack -- smoothes the transition to the next page
+    controls.start({
+      opacity: 1,
+      y: 0,
+    })
+  }, [currentSlide])
+
+  // next slide
+  const next = useCallback(() => {
+    setCurrentSlide((curr) => (curr === movies.length - 1 ? curr : curr + 1))
+
+    if (setNextBlock && setNextBlock(currentSlide)) {
+      // reset current slide on next block
+      setCurrentSlide(0)
     }
   }, [currentSlide])
 
-  const slides = allMovies
-    // .reverse()
-    .map((movie, index) => (
-      <Slide
-        key={index}
-        movie={movie}
-        above={index > allMovies.length - currentSlide - 1}
-      />
-    ))
+  // previous slide
+  const prev = useCallback(() => {
+    setCurrentSlide((curr) => (curr === 0 ? curr : curr - 1))
+
+    if (setPrevBlock && setPrevBlock(currentSlide)) {
+      // set current slide to last item on previous block
+      setCurrentSlide(movies.length - 1)
+    }
+  }, [currentSlide])
+
+  const getAnimate = useCallback((index, currentSlideNumber) => {
+    if (index === currentSlideNumber) {
+      return controls
+    }
+    if (index < currentSlideNumber) {
+      if (index + 2 < currentSlideNumber) {
+        return { opacity: 0, y: '100vh' }
+      }
+      return { opacity: 0, y: '-100vh' }
+    }
+    if (index > currentSlideNumber) {
+      if (index - 2 > currentSlideNumber) {
+        return { opacity: 0, y: '-100vh' }
+      }
+      return { opacity: 0, y: '100vh' }
+    }
+  }, [])
+
+  const slides = movies.map((movie, index) => (
+    <motion.div
+      key={`${index}-motion`}
+      initial={{ opacity: 0, y: '100vh' }}
+      animate={getAnimate(index, currentSlide)}
+      transition={{ ease: 'easeOut', duration: 0.4 }}
+    >
+      <Slide key={index} movie={movie} />
+    </motion.div>
+  ))
   return (
     <div>
-      <ScrollMaster {...{ next, prev, isFirst, isLast }} />
-      {slides}
+      <ScrollMaster {...{ next, prev }} />
+      <AnimatePresence>{slides}</AnimatePresence>
     </div>
   )
 }
 
 interface ISlide {
   movie: Movie
-  above: boolean
 }
 
 const Slide = (props: ISlide) => {
-  const top = props.above ? '-120vh' : 0
+  const { movie } = props
 
-  useEffect(() => {
-    console.log('props.above', props.above)
-  }, [props.above])
+  const details = [
+    (movie.first_air_date || movie.release_date).substring(0, 4),
+    `${movie.release_date ? 'Movie' : 'Series'}`,
+    movie.genres.map((g) => g.name).join(' / '),
+  ]
 
   return (
-    <>
-      <div className={styles.slideContainer} style={{ top }}>
-        {props.movie.name}
-        <Screens screens={props.movie.screens} title={props.movie.name} />
+    <div className={styles.slideContainer}>
+      <h2>{movie.name}</h2>
+      <div>{details.join(' / ')}</div>
+      <div className={styles.screensContainer}>
+        <Screens screens={movie.screens} title={movie.name} />
       </div>
-    </>
+    </div>
   )
 }
 
@@ -117,13 +111,11 @@ const Slide = (props: ISlide) => {
 interface IScrollMaster {
   next: () => void
   prev: () => void
-  isFirst: boolean
-  isLast: boolean
 }
 
 const ScrollMaster = (props: IScrollMaster) => {
   const [wheelLoad, setWheelLoad] = useState(0)
-  const { next, prev, isFirst, isLast } = props
+  const { next, prev } = props
 
   const [timer, setTimer] = useState(null)
 
@@ -160,7 +152,7 @@ const ScrollMaster = (props: IScrollMaster) => {
   const handleWheelChange = (e) => {
     // e.preventDefault()
     e.stopPropagation()
-    setWheelLoad((old) => old + e.deltaY)
+    setWheelLoad((curr) => curr + e.deltaY)
     return false
   }
 
@@ -181,14 +173,15 @@ const ScrollMaster = (props: IScrollMaster) => {
   }, [wheelLoad])
 
   const wheelLoadPercent = wheelLoad / (SCROLL_STRENGTH / 100)
-  const indicatorHeight =
-    wheelLoadPercent < 0
-      ? isFirst
-        ? 0
-        : wheelLoadPercent
-      : isLast
-      ? 0
-      : wheelLoadPercent
+  const indicatorHeight = wheelLoadPercent
+  // const indicatorHeight =
+  //   wheelLoadPercent < 0
+  //     ? isFirst
+  //       ? 0
+  //       : wheelLoadPercent
+  //     : isLast
+  //     ? 0
+  //     : wheelLoadPercent
 
   const position = indicatorHeight > 0 ? { bottom: 0 } : { top: 0 }
   const indicatorDimensions = {
