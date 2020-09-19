@@ -1,7 +1,7 @@
 import Head from 'next/head'
 import fetch from 'node-fetch'
 import { NextPage, NextPageContext } from 'next'
-import { Movie, AllMoviesStats } from '~/types'
+import { Movie } from '~/types'
 import Slider from '~/components/Slider'
 import { useState, useCallback, useEffect } from 'react'
 
@@ -119,8 +119,6 @@ const getProps = () => async (props: NextPageContext) => {
     body: JSON.stringify({ query }),
   }).then((r) => r.json())
 
-  console.log(movies)
-
   return {
     initMovies: movies,
   }
@@ -129,65 +127,3 @@ const getProps = () => async (props: NextPageContext) => {
 Slides.getInitialProps = getProps()
 
 export default Slides
-
-// const [movies, setmovies] = useState<Movie[]>(initMovies.data.movies)
-
-// const [page, setPage] = useState(2)
-
-// const moviesQuery = gql`
-//   query Movies($page: Int!) {
-//     movies(movieCount: 5, page: $page) {
-//       name
-//       genres {
-//         name
-//       }
-//       release_date
-//       screens {
-//         public_urls {
-//           thumb
-//           full
-//         }
-//       }
-//     }
-//   }
-// `
-// const { loading, error, data: moviesPage, fetchMore } = useQuery(
-//   moviesQuery,
-//   {
-//     variables: {
-//       page,
-//     },
-//     fetchPolicy: 'cache-and-network',
-//   }
-// )
-
-// const loadNewPage = () =>
-//   fetchMore({
-//     variables: {
-//       page: moviesPage.movies.length / 5 + 1,
-//     },
-//     updateQuery: (prevPage, { fetchMoreResult }) => {
-//       console.log('fetchMoreResult', fetchMoreResult)
-//       if (!fetchMoreResult) return prevPage
-//       return {
-//         ...prevPage,
-//         ...{ movies: [...prevPage.movies, ...fetchMoreResult.movies] },
-//       }
-//       // return Object.assign({}, prevPage, {
-//       //   feed: [...prevPage.movies, ...fetchMoreResult.movies],
-//       // })
-//     },
-//   })
-
-// console.log('error', error)
-// console.log('newPageMovies', newPageMovies)
-
-// useEffect(() => {
-//   if (movies) {
-//     console.log('newPageMovies', movies)
-//     setmovies((old) => [...movies.movies, ...old])
-//   }
-// }, [movies])
-
-// if (loading) return <p>Loading...</p>
-// if (error) return <p>Error :(</p>
