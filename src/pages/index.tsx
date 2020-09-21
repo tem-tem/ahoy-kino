@@ -1,37 +1,73 @@
 import Head from 'next/head'
-import Feed from '~/components/Feed'
+import fetch from 'node-fetch'
 import { NextPage, NextPageContext } from 'next'
-import { Movie, AllMoviesStats } from '~/types'
-import loadFirebase from '~/lib/loadFirebase'
-import { useQuery, gql } from '@apollo/client'
+import { Movie } from '~/types'
+import Slider from '~/components/Slider'
+import { useState, useCallback, useEffect } from 'react'
 
-const MOVIES = gql`
-  query {
-    movies(movieCount: 5, page: 1) {
-      name
-      screens {
-        public_urls {
-          thumb
-        }
-      }
-    }
-  }
-`
+// fullList -- big list of movies (it loads 1000 items)
+//    it's used in combination with BLOCK_LENGTH, and lMark:
+//    starting with the index of lMark, the BLOCK_LENGTH amount of items is considered as a BLOCK of slides
+//    TODO: create a pagination for it?
+// BLOCK_LENGTH -- size of the block
+// lMark -- index of the current block's first item
+// currentBlock -- this block is used in Slider
+// atEdge -- currentBlock is at the left or right edge of the fullList
 
 interface Props {
-  pageMovies?: Movie[]
-  ELEMENTS_ON_PAGE: number
-  stats: AllMoviesStats
+  initMovies?: { data: { movies: Movie[] } }
 }
 
-const Home: NextPage<Props> = (props) => {
-  const { pageMovies, ELEMENTS_ON_PAGE, stats } = props
-  const { loading, error, data } = useQuery(MOVIES)
+const BLOCK_LENGTH = 5
 
-  if (loading) return <p>Loading...</p>
-  if (error) return <p>Error :(</p>
+const Slides: NextPage<Props> = (props) => {
+  const { initMovies } = props
+  const [fullList] = useState(initMovies.data.movies)
+  const [lMark, setLMark] = useState(0)
+  const [currentBlock, setCurrentBlock] = useState(
+    fullList.slice(lMark, lMark + BLOCK_LENGTH)
+  )
+  const [isFirstBlock, setFB] = useState(lMark === 0)
+  const [isLastBlock, setLB] = useState(
+    lMark === fullList.length - (fullList.length % BLOCK_LENGTH)
+  )
 
-  console.log(data)
+  useEffect(() => {
+    setCurrentBlock(fullList.slice(lMark, lMark + BLOCK_LENGTH))
+    setFB(lMark === 0)
+    setLB(lMark === fullList.length - (fullList.length % BLOCK_LENGTH))
+  }, [lMark])
+
+  const setNextBlock = useCallback(
+    (slideNumber) => {
+      if (
+        slideNumber === BLOCK_LENGTH - 1 &&
+        lMark <= fullList.length - BLOCK_LENGTH
+      ) {
+        // slideNumber is at the right edge -- no next slide
+        // moving lMark to load next block of slides
+        setLMark((old) => old + BLOCK_LENGTH)
+        return true
+      }
+      // no need to load next block of slides
+      return false
+    },
+    [lMark, fullList]
+  )
+
+  const setPrevBlock = useCallback(
+    (slideNumber) => {
+      if (slideNumber === 0 && lMark >= BLOCK_LENGTH) {
+        // slideNumber is at the left edge -- no previous slide
+        // moving lMark to the lefft, to load previous block of slides
+        setLMark((old) => old - BLOCK_LENGTH)
+        return true
+      }
+      // no need to load previous block of slides
+      return false
+    },
+    [lMark]
+  )
 
   return (
     <div className='container'>
@@ -57,10 +93,14 @@ const Home: NextPage<Props> = (props) => {
       </Head>
 
       <main>
-        <Feed
-          initMovies={pageMovies}
-          ELEMENTS_ON_PAGE={ELEMENTS_ON_PAGE}
-          stats={stats}
+        <Slider
+          movies={currentBlock}
+          setNextBlock={setNextBlock}
+          setPrevBlock={setPrevBlock}
+          isFirstBlock={isFirstBlock}
+          isLastBlock={isLastBlock}
+          // isFirst={lMark === 0}
+          // isLast={lMark === fullList.length - (fullList.length % BLOCK_LENGTH)}
         />
       </main>
     </div>
@@ -68,45 +108,33 @@ const Home: NextPage<Props> = (props) => {
 }
 
 const getProps = () => async (props: NextPageContext) => {
-  const db = loadFirebase().firestore()
-  const ELEMENTS_ON_PAGE = 3
-
-  const stats = await new Promise((resolve: (data: AllMoviesStats) => void) => {
-    db.collection('movies')
-      .doc('--stats--')
-      .get()
-      .then(async (snap) => {
-        resolve((await snap.data()) as AllMoviesStats)
-      })
-  })
-
-  const page = db
-    .collection('movies')
-    .orderBy('createdAt')
-    .limit(ELEMENTS_ON_PAGE)
-
-  const pageMovies = await new Promise(
-    (resolve: (val: Movie[]) => void, reject) => {
-      page.get().then((snaps) => {
-        if (snaps.docs.length > 0) {
-          const movies = []
-          snaps.forEach((movieDoc) => {
-            movies.push({ id: movieDoc.id, ...movieDoc.data() })
-          })
-          resolve(movies)
+  const url = 'http://api.ahoy.tem-tem.com/graphql'
+  const query = `query {
+    movies(movieCount: 1000, page: 1) {
+      name
+      genres {
+        name
+      }
+      release_date
+      screens {
+        public_urls {
+          thumb
+          full
         }
-        resolve([])
-      })
+      }
     }
-  )
+  }`
+
+  const movies = await fetch(url, {
+    method: 'POST',
+    body: JSON.stringify({ query }),
+  }).then((r) => r.json())
 
   return {
-    pageMovies,
-    ELEMENTS_ON_PAGE,
-    stats,
+    initMovies: movies,
   }
 }
 
-Home.getInitialProps = getProps()
+Slides.getInitialProps = getProps()
 
-export default Home
+export default Slides
