@@ -11,19 +11,33 @@ interface ISlider {
   movies: Movie[]
   setNextBlock?: (currentSlideNumber: number) => boolean
   setPrevBlock?: (currentSlideNumber: number) => boolean
+  isFirstBlock: boolean
+  isLastBlock: boolean
 }
 
 export default (props: ISlider) => {
-  const { movies, setNextBlock, setPrevBlock } = props
+  const {
+    movies,
+    setNextBlock,
+    setPrevBlock,
+    isFirstBlock,
+    isLastBlock,
+  } = props
   const [currentSlide, setCurrentSlide] = useState(0)
   const controls = useAnimation()
+  const [isFirstSlide, setF] = useState(isFirstBlock && currentSlide === 0)
+  const [isLastSlide, setL] = useState(
+    isLastBlock && currentSlide === movies.length - 1
+  )
 
+  // framer-motion animation hack -- smoothes the transition to the next page
   useEffect(() => {
-    // framer-motion animation hack -- smoothes the transition to the next page
     controls.start({
       opacity: 1,
       y: 0,
     })
+    setF(isFirstBlock && currentSlide === 0)
+    setL(isLastBlock && currentSlide === movies.length - 1)
   }, [currentSlide])
 
   // next slide
@@ -76,7 +90,14 @@ export default (props: ISlider) => {
   ))
   return (
     <div>
-      <ScrollMaster {...{ next, prev }} />
+      <ScrollMaster
+        {...{
+          next,
+          prev,
+          isFirstSlide,
+          isLastSlide,
+        }}
+      />
       <AnimatePresence>{slides}</AnimatePresence>
     </div>
   )
@@ -111,11 +132,13 @@ const Slide = (props: ISlide) => {
 interface IScrollMaster {
   next: () => void
   prev: () => void
+  isFirstSlide: boolean
+  isLastSlide: boolean
 }
 
 const ScrollMaster = (props: IScrollMaster) => {
   const [wheelLoad, setWheelLoad] = useState(0)
-  const { next, prev } = props
+  const { next, prev, isFirstSlide, isLastSlide } = props
 
   const [timer, setTimer] = useState(null)
 
@@ -173,15 +196,15 @@ const ScrollMaster = (props: IScrollMaster) => {
   }, [wheelLoad])
 
   const wheelLoadPercent = wheelLoad / (SCROLL_STRENGTH / 100)
-  const indicatorHeight = wheelLoadPercent
-  // const indicatorHeight =
-  //   wheelLoadPercent < 0
-  //     ? isFirst
-  //       ? 0
-  //       : wheelLoadPercent
-  //     : isLast
-  //     ? 0
-  //     : wheelLoadPercent
+  // const indicatorHeight = wheelLoadPercent
+  const indicatorHeight =
+    wheelLoadPercent < 0
+      ? isFirstSlide
+        ? 0
+        : wheelLoadPercent
+      : isLastSlide
+      ? 0
+      : wheelLoadPercent
 
   const position = indicatorHeight > 0 ? { bottom: 0 } : { top: 0 }
   const indicatorDimensions = {

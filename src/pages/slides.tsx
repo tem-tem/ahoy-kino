@@ -12,6 +12,7 @@ import { useState, useCallback, useEffect } from 'react'
 // BLOCK_LENGTH -- size of the block
 // lMark -- index of the current block's first item
 // currentBlock -- this block is used in Slider
+// atEdge -- currentBlock is at the left or right edge of the fullList
 
 interface Props {
   initMovies?: { data: { movies: Movie[] } }
@@ -26,9 +27,15 @@ const Slides: NextPage<Props> = (props) => {
   const [currentBlock, setCurrentBlock] = useState(
     fullList.slice(lMark, lMark + BLOCK_LENGTH)
   )
+  const [isFirstBlock, setFB] = useState(lMark === 0)
+  const [isLastBlock, setLB] = useState(
+    lMark === fullList.length - (fullList.length % BLOCK_LENGTH)
+  )
 
   useEffect(() => {
     setCurrentBlock(fullList.slice(lMark, lMark + BLOCK_LENGTH))
+    setFB(lMark === 0)
+    setLB(lMark === fullList.length - (fullList.length % BLOCK_LENGTH))
   }, [lMark])
 
   const setNextBlock = useCallback(
@@ -90,6 +97,10 @@ const Slides: NextPage<Props> = (props) => {
           movies={currentBlock}
           setNextBlock={setNextBlock}
           setPrevBlock={setPrevBlock}
+          isFirstBlock={isFirstBlock}
+          isLastBlock={isLastBlock}
+          // isFirst={lMark === 0}
+          // isLast={lMark === fullList.length - (fullList.length % BLOCK_LENGTH)}
         />
       </main>
     </div>
